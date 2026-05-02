@@ -6,58 +6,57 @@
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{width:100vw;height:100vh;overflow:hidden;background:#000;font-family:'Nunito',sans-serif;user-select:none;}
+html,body{width:100vw;height:100vh;overflow:hidden;background:linear-gradient(160deg,#1a5a08 0%,#2e8a14 40%,#FF8800 100%);font-family:'Nunito',sans-serif;user-select:none;}
 #shell{position:absolute;transform-origin:top left;width:1024px;height:620px;}
 canvas{display:block;width:1024px;height:620px;}
 
-/* ── WELCOME SCREEN ── */
 #welcome-screen{
 position:absolute;inset:0;z-index:100;
 background:linear-gradient(160deg,#1a5a08 0%,#2e8a14 40%,#FF8800 100%);
-display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
-overflow-y:auto;padding:16px 0 24px;
+display:flex;flex-direction:column;align-items:center;justify-content:center;
+overflow:hidden;padding:12px 0;
 }
 #welcome-screen.hidden{display:none;}
-.ws-title{font-family:'Fredoka One',cursive;font-size:54px;color:#FFE044;
-text-shadow:0 4px 0 #AA4400,0 8px 24px rgba(0,0,0,.5);margin-bottom:4px;letter-spacing:2px;}
-.ws-sub{font-family:'Fredoka One',cursive;font-size:18px;color:rgba(255,255,220,.85);
-margin-bottom:12px;letter-spacing:1px;}
+.ws-title{font-family:'Fredoka One',cursive;font-size:44px;color:#FFE044;
+text-shadow:0 4px 0 #AA4400,0 8px 24px rgba(0,0,0,.5);margin-bottom:2px;letter-spacing:2px;}
+.ws-sub{font-family:'Fredoka One',cursive;font-size:15px;color:rgba(255,255,220,.85);
+margin-bottom:8px;letter-spacing:1px;}
 .ws-box{
-background:rgba(0,0,0,.55);border-radius:22px;
+background:rgba(0,0,0,.55);border-radius:18px;
 border:2px solid rgba(255,220,80,.35);
-padding:14px 28px;max-width:680px;width:90%;margin-bottom:12px;
+padding:10px 22px;max-width:820px;width:92%;margin-bottom:8px;
 }
-.ws-box h2{font-family:'Fredoka One',cursive;font-size:20px;color:#FFD700;margin-bottom:14px;text-align:center;letter-spacing:.5px;}
-.ws-steps{display:grid;grid-template-columns:1fr 1fr;gap:10px 20px;}
-.ws-step{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:#eee;line-height:1.5;}
+.ws-box h2{font-family:'Fredoka One',cursive;font-size:17px;color:#FFD700;margin-bottom:10px;text-align:center;letter-spacing:.5px;}
+.ws-steps{display:grid;grid-template-columns:1fr 1fr;gap:7px 16px;}
+.ws-step{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:#eee;line-height:1.4;}
 .ws-num{
-min-width:26px;height:26px;border-radius:50%;
+min-width:22px;height:22px;border-radius:50%;
 background:linear-gradient(135deg,#FF9500,#FF5500);
 display:flex;align-items:center;justify-content:center;
-font-family:'Fredoka One',cursive;font-size:14px;color:#fff;
+font-family:'Fredoka One',cursive;font-size:12px;color:#fff;
 margin-top:1px;flex-shrink:0;
 }
 .ws-controls{
-background:rgba(0,0,0,.45);border-radius:14px;
+background:rgba(0,0,0,.45);border-radius:12px;
 border:1px solid rgba(255,255,255,.15);
-padding:10px 20px;max-width:680px;width:90%;margin-bottom:12px;
-display:flex;gap:16px;flex-wrap:wrap;justify-content:center;
+padding:8px 16px;max-width:820px;width:92%;margin-bottom:8px;
+display:flex;gap:12px;flex-wrap:wrap;justify-content:center;
 }
-.ws-key{display:flex;align-items:center;gap:8px;font-size:12px;color:#ddd;}
+.ws-key{display:flex;align-items:center;gap:6px;font-size:11px;color:#ddd;}
 .key-badge{
 background:rgba(255,255,255,.18);border:1.5px solid rgba(255,255,255,.3);
-border-radius:7px;padding:2px 9px;font-family:'Fredoka One',cursive;font-size:13px;color:#fff;
+border-radius:7px;padding:2px 8px;font-family:'Fredoka One',cursive;font-size:12px;color:#fff;
 }
 .ws-goal{
 background:rgba(255,200,50,.15);border:1.5px solid rgba(255,200,50,.35);
-border-radius:14px;padding:10px 24px;max-width:680px;width:90%;
-font-family:'Fredoka One',cursive;font-size:14px;color:#FFE066;
-text-align:center;margin-bottom:18px;
+border-radius:12px;padding:8px 20px;max-width:820px;width:92%;
+font-family:'Fredoka One',cursive;font-size:13px;color:#FFE066;
+text-align:center;margin-bottom:12px;
 }
 #btn-play{
-font-family:'Fredoka One',cursive;font-size:26px;color:#fff;
+font-family:'Fredoka One',cursive;font-size:22px;color:#fff;
 background:linear-gradient(135deg,#FF7700,#FF3300);
-border:none;border-radius:50px;padding:16px 64px;cursor:pointer;
+border:none;border-radius:50px;padding:12px 56px;cursor:pointer;
 box-shadow:0 6px 0 #AA2200,0 8px 28px rgba(0,0,0,.4);
 transition:transform .12s,box-shadow .12s;letter-spacing:1px;
 }
@@ -114,6 +113,120 @@ transition:transform .2s cubic-bezier(.34,1.56,.64,1),opacity .15s;
 #tc-yes{background:linear-gradient(135deg,#DD3333,#AA1111);color:#fff;}
 #tc-no{background:rgba(255,255,255,.12);color:#ddd;border:1px solid rgba(255,255,255,.2);}
 
+/* ── FRUIT PICKER ── */
+#fruit-picker{
+  position:absolute;
+  left:50%;bottom:90px;
+  transform:translateX(-50%) translateY(0) scale(1);
+  background:rgba(14,8,4,.93);
+  backdrop-filter:blur(10px);
+  border-radius:22px;
+  padding:14px 18px 16px;
+  box-shadow:0 12px 40px rgba(0,0,0,.65);
+  border:2px solid rgba(255,200,60,.4);
+  z-index:35;
+  min-width:260px;
+  max-width:560px;
+  transform-origin:bottom center;
+  transition:transform .22s cubic-bezier(.34,1.56,.64,1),opacity .15s;
+}
+#fruit-picker.hidden{transform:translateX(-50%) scale(0);opacity:0;pointer-events:none;}
+#fruit-picker h3{
+  font-family:'Fredoka One',cursive;font-size:14px;color:#FFD060;
+  text-align:center;margin-bottom:10px;letter-spacing:.5px;text-transform:uppercase;
+}
+#fp-options{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
+.fp-btn{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  background:rgba(255,255,255,.09);
+  border:2px solid rgba(255,255,255,.18);
+  border-radius:14px;padding:8px 14px;cursor:pointer;
+  transition:transform .12s,background .12s,border-color .12s;
+  font-family:'Fredoka One',cursive;
+}
+.fp-btn:hover{transform:scale(1.1);background:rgba(255,200,60,.22);border-color:rgba(255,200,60,.7);}
+.fp-btn:active{transform:scale(.95);}
+.fp-em{font-size:28px;line-height:1;}
+.fp-label{font-size:11px;color:#ddd;}
+.fp-count{
+  font-size:12px;color:#FFD060;
+  background:rgba(255,200,60,.2);border-radius:8px;padding:1px 6px;
+}
+.fp-cancel{
+  display:block;margin:10px auto 0;
+  font-family:'Fredoka One',cursive;font-size:12px;
+  background:none;border:1px solid rgba(255,255,255,.2);
+  border-radius:8px;padding:4px 16px;color:#aaa;cursor:pointer;
+}
+.fp-cancel:hover{background:rgba(255,255,255,.1);color:#fff;}
+
+/* ── MESSAGE SYSTEM ── */
+#msg-box{
+  position:absolute;
+  bottom:58px;left:50%;
+  transform:translateX(-50%);
+  width:560px;
+  background:rgba(10,6,3,.94);
+  backdrop-filter:blur(12px);
+  border-radius:18px;
+  border:2px solid rgba(255,210,80,.35);
+  box-shadow:0 10px 40px rgba(0,0,0,.6);
+  padding:12px 16px 10px;
+  z-index:38;
+  display:flex;gap:12px;align-items:flex-start;
+  transition:opacity .25s, transform .25s cubic-bezier(.34,1.56,.64,1);
+  pointer-events:none;
+}
+#msg-box.msg-hidden{
+  opacity:0;
+  transform:translateX(-50%) translateY(14px) scale(.96);
+  pointer-events:none;
+}
+#msg-box.msg-visible{
+  opacity:1;
+  transform:translateX(-50%) translateY(0) scale(1);
+}
+#msg-avatar{
+  width:44px;height:44px;border-radius:50%;
+  background:rgba(255,255,255,.12);
+  border:2px solid rgba(255,210,80,.4);
+  display:flex;align-items:center;justify-content:center;
+  font-size:24px;flex-shrink:0;
+  box-shadow:0 2px 10px rgba(0,0,0,.4);
+}
+#msg-body{flex:1;min-width:0;}
+#msg-name{
+  font-family:'Fredoka One',cursive;
+  font-size:12px;color:#FFD060;
+  margin-bottom:4px;letter-spacing:.4px;
+}
+#msg-text{
+  font-family:'Nunito',sans-serif;
+  font-size:13px;color:#f0f0e8;
+  line-height:1.5;
+  min-height:18px;
+}
+#msg-dots{
+  display:flex;gap:4px;align-items:center;
+  margin-top:6px;
+}
+.msg-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:rgba(255,210,80,.5);
+  animation:msgdot .9s infinite;
+}
+.msg-dot:nth-child(2){animation-delay:.2s;}
+.msg-dot:nth-child(3){animation-delay:.4s;}
+@keyframes msgdot{0%,80%,100%{transform:scale(.6);opacity:.4}40%{transform:scale(1);opacity:1}}
+#msg-continue{
+  font-family:'Fredoka One',cursive;
+  font-size:10px;color:rgba(255,210,80,.6);
+  margin-top:5px;
+  animation:blink 1.2s infinite;
+  display:none;
+}
+@keyframes blink{0%,100%{opacity:.4}50%{opacity:1}}
+
 #tip{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.78);color:#fff;font-family:'Fredoka One',cursive;font-size:15px;padding:9px 28px;border-radius:50px;z-index:20;pointer-events:none;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.3);border:2px solid rgba(255,255,255,.15)}
 
 #notif{position:absolute;top:46%;left:50%;transform:translate(-50%,-50%) scale(0);background:#fff;border-radius:22px;padding:14px 32px;box-shadow:0 10px 40px rgba(0,0,0,.3);font-family:'Fredoka One',cursive;font-size:22px;color:#333;text-align:center;transition:transform .2s cubic-bezier(.34,1.56,.64,1);z-index:40;pointer-events:none;white-space:nowrap;border:3px solid rgba(255,200,0,.4)}
@@ -130,7 +243,6 @@ transition:transform .2s cubic-bezier(.34,1.56,.64,1),opacity .15s;
 <div id="shell">
 <canvas id="c" width="1024" height="620"></canvas>
 
-<!-- ══════════════ ÉCRAN D'ACCUEIL ══════════════ -->
 <div id="welcome-screen">
   <div class="ws-title">🍊 Juice Farm</div>
   <div class="ws-sub">Le jeu du fermier-juicier !</div>
@@ -169,7 +281,6 @@ transition:transform .2s cubic-bezier(.34,1.56,.64,1),opacity .15s;
 
   <button id="btn-play">🍹 Jouer !</button>
 </div>
-<!-- ════════════════════════════════════════════ -->
 
 <div id="hud">
   <div class="pill pg">💰 <span id="hM">$0</span></div>
@@ -205,6 +316,22 @@ transition:transform .2s cubic-bezier(.34,1.56,.64,1),opacity .15s;
   </div>
 </div>
 
+<div id="fruit-picker" class="hidden">
+  <h3>⚡ Quel fruit mixer ?</h3>
+  <div id="fp-options"></div>
+  <button class="fp-cancel" id="fp-cancel">Annuler</button>
+</div>
+
+<div id="msg-box" class="msg-hidden">
+  <div id="msg-avatar">👨‍🍳</div>
+  <div id="msg-body">
+    <div id="msg-name">Barista</div>
+    <div id="msg-text"></div>
+    <div id="msg-dots"><div class="msg-dot"></div><div class="msg-dot"></div><div class="msg-dot"></div></div>
+    <div id="msg-continue">▶ suite…</div>
+  </div>
+</div>
+
 <div id="tip">Monte dans le 🚛 camion et appuie sur [E] pour conduire vers la forêt !</div>
 <div id="notif"></div>
 <div id="transition"></div>
@@ -216,6 +343,9 @@ const gx = cv.getContext('2d');
 const W = 1024, H = 620;
 const ROAD_Y = 370, ROAD_H = 46;
 
+// ── FIX: patience in frames at 60fps. 3600 = 60s, 3000 = 50s ──
+const PATIENCE_FRAMES = 3000; // 50 seconds
+
 const FRUITS = [
   { key:'orange', em:'🍊', fruit:'#FF8800', pay:12, label:'Orange' },
   { key:'apple',  em:'🍎', fruit:'#DD2222', pay:10, label:'Pomme' },
@@ -225,11 +355,196 @@ const FRUITS = [
   { key:'pine',   em:'🍍', fruit:'#CCAA00', pay:18, label:'Ananas' },
 ];
 
-// ── Welcome screen ──
 let gameStarted = false;
+
+// ── MESSAGE SYSTEM ──
+const MSG_CHARS = {
+  barista: { name:'👨‍🍳 Barista', em:'👨‍🍳', color:'#FFD060' },
+  customer:{ name:'👤 Client',   em:'👤',    color:'#88DDFF' },
+  guide:   { name:'🌟 Guide',    em:'🌟',    color:'#AAFFAA' },
+  truck:   { name:'🚛 Camion',   em:'🚛',    color:'#FFAA44' },
+  forest:  { name:'🌲 Forêt',   em:'🌲',    color:'#66FF88' },
+};
+
+let msgQueue = [];
+let msgActive = false;
+let msgTypingIdx = 0;
+let msgTypingTick = 0;
+let msgCurrent = null;
+let msgAutoHideTimer = null;
+let msgShownKeys = new Set(); // prevent repeat messages
+
+function queueMsg(charKey, text, opts={}){
+  const key = opts.key || (charKey+':'+text.slice(0,20));
+  if(opts.once && msgShownKeys.has(key)) return;
+  if(opts.once) msgShownKeys.add(key);
+  msgQueue.push({ charKey, text, duration: opts.duration||3800, key });
+  if(!msgActive) showNextMsg();
+}
+
+function showNextMsg(){
+  if(!msgQueue.length){ hideMsg(); return; }
+  msgCurrent = msgQueue.shift();
+  msgActive = true;
+  const ch = MSG_CHARS[msgCurrent.charKey] || MSG_CHARS.guide;
+  document.getElementById('msg-avatar').textContent = ch.em;
+  document.getElementById('msg-name').textContent = ch.name;
+  document.getElementById('msg-name').style.color = ch.color;
+  document.getElementById('msg-text').textContent = '';
+  document.getElementById('msg-dots').style.display = 'flex';
+  document.getElementById('msg-continue').style.display = 'none';
+  document.getElementById('msg-box').className = 'msg-visible';
+  msgTypingIdx = 0; msgTypingTick = 0;
+  clearTimeout(msgAutoHideTimer);
+}
+
+function hideMsg(){
+  msgActive = false; msgCurrent = null;
+  document.getElementById('msg-box').className = 'msg-hidden';
+  clearTimeout(msgAutoHideTimer);
+}
+
+function updateMsgSystem(){
+  if(!msgActive || !msgCurrent) return;
+  const txt = msgCurrent.text;
+  msgTypingTick++;
+  // Type one char every 1.5 ticks
+  if(msgTypingIdx < txt.length && msgTypingTick % 2 === 0){
+    msgTypingIdx++;
+    document.getElementById('msg-text').textContent = txt.slice(0, msgTypingIdx);
+  }
+  if(msgTypingIdx >= txt.length){
+    document.getElementById('msg-dots').style.display = 'none';
+    if(msgQueue.length > 0){
+      document.getElementById('msg-continue').style.display = 'block';
+    }
+    clearTimeout(msgAutoHideTimer);
+    msgAutoHideTimer = setTimeout(()=>{ showNextMsg(); }, msgCurrent.duration);
+  }
+}
+
+// ── GAME STATE TRACKING for contextual messages ──
+let prevBasketLen = 0;
+let prevHeldJuice = null;
+let prevScene = 'main';
+let prevCustomerCount = 0;
+let prevBlending = false;
+let msgCooldowns = {}; // key -> tick when last shown
+
+function cooldown(key, frames){
+  if((msgCooldowns[key]||0) > tick) return true;
+  msgCooldowns[key] = tick + frames;
+  return false;
+}
+
+function updateContextualMessages(){
+  if(!gameStarted) return;
+
+  const waitingCustomers = customers.filter(c=>c.status==='wait');
+  const urgentCustomers  = customers.filter(c=>c.status==='wait' && c.timer/c.patience > 0.65);
+
+  // ── New customer arrives ──
+  if(customers.length > prevCustomerCount && customers.some(c=>c.status==='walk')){
+    const c = customers[customers.length-1];
+    const f = FRUITS.find(t=>t.key===c.want);
+    if(!cooldown('cust_arrive', 300)){
+      queueMsg('customer', `Bonjour ! Je voudrais un jus de ${f?f.label:'fruit'} ${f?f.em:'🍹'} s'il vous plaît !`, {key:'cust_arrive_'+tick});
+    }
+  }
+  prevCustomerCount = customers.length;
+
+  // ── No fruits, no juice, customers waiting ──
+  if(scene==='main' && !basket.length && !heldJuice && !blending && waitingCustomers.length>0){
+    if(!cooldown('no_fruit_remind', 600)){
+      const f = FRUITS.find(t=>t.key===waitingCustomers[0].want);
+      queueMsg('barista', `On a des clients qui attendent ! Il nous faut du ${f?f.label+' '+f.em:'fruit'} — monte dans le 🚛 camion et va à la forêt !`, {key:'no_fruit_'+tick, once:false});
+    }
+  }
+
+  // ── Has fruits, not near bar ──
+  if(scene==='main' && basket.length>0 && !heldJuice && !blending){
+    const nearBar = dist(player,{x:bar.x+120,y:bar.y+220})<120;
+    if(!nearBar && !cooldown('bring_to_bar', 500)){
+      queueMsg('barista', `Tu as des fruits dans ton panier 🧺 — amène-les au blender ⚡ pour faire un jus !`, {key:'bring_bar', once:false});
+    }
+  }
+
+  // ── Basket filled (came back from forest) ──
+  if(basket.length > prevBasketLen && basket.length >= 3 && scene==='main'){
+    if(!cooldown('basket_full', 400)){
+      queueMsg('barista', `Parfait ! Tu as ${basket.length} fruits 🧺 — va au blender ⚡ et choisit un fruit à mixer !`, {key:'basket_ok_'+basket.length});
+    }
+  }
+  prevBasketLen = basket.length;
+
+  // ── Blending just started ──
+  if(blending && !prevBlending){
+    const f = FRUITS.find(t=>t.key===blendFruit);
+    queueMsg('barista', `Voilà, on mixe le ${f?f.label:''} ${f?f.em:'🍊'} ! Ça va être délicieux ! ⚡`, {key:'blend_start_'+blendFruit});
+  }
+  prevBlending = blending;
+
+  // ── Juice ready but no matching customer ──
+  if(heldJuice && !prevHeldJuice){
+    const match = customers.find(c=>c.status==='wait'&&c.want===heldJuice);
+    const f = FRUITS.find(t=>t.key===heldJuice);
+    if(match){
+      queueMsg('barista', `Le jus de ${f?f.label:''} ${f?f.em:'🧃'} est prêt ! Un client l'attend — vas vite le servir !`, {key:'juice_ready_match'});
+    } else {
+      queueMsg('barista', `Le jus de ${f?f.label:''} ${f?f.em:'🧃'} est prêt ! Cherche le client qui en veut un...`, {key:'juice_ready_nomatch'});
+    }
+  }
+  prevHeldJuice = heldJuice;
+
+  // ── Customer patience getting low (urgent) ──
+  if(urgentCustomers.length>0 && heldJuice && !cooldown('urgent_serve', 360)){
+    const f = FRUITS.find(t=>t.key===urgentCustomers[0].want);
+    queueMsg('customer', `Excusez-moi… je commence à perdre patience ! Mon jus de ${f?f.label:'fruit'} ${f?f.em:'🍹'}, s'il vous plaît ! 😤`, {key:'urgent_'+tick});
+  }
+
+  // ── Customer leaves without being served ──
+  // (handled in updateMain on status change to 'leave')
+
+  // ── Scene changes ──
+  if(scene !== prevScene){
+    if(scene==='journey' && prevScene==='main'){
+      queueMsg('truck', `En route pour la forêt ! Maintiens ↑ ou W pour accélérer ! 🌲`, {key:'journey_start', once:true});
+    }
+    if(scene==='forest' && prevScene==='journey'){
+      const allHarvested = FOREST_TREES.every(t=>t.harvested);
+      if(allHarvested){
+        queueMsg('forest', `Tous les arbres ont été cueillis ! Reviens dans quelques secondes pour qu'ils repoussent 🌱`, {key:'forest_empty', once:false});
+      } else {
+        queueMsg('forest', `Bienvenue dans la forêt ! Approche-toi d'un arbre 🌳 et appuie sur [E] pour cueillir des fruits !`, {key:'forest_enter', once:true});
+      }
+    }
+    if(scene==='main' && prevScene==='forest'){
+      if(basket.length>0){
+        queueMsg('barista', `Bien joué ! Tu as rapporté ${basket.length} fruit${basket.length>1?'s':''} ! Viens au blender ⚡ les transformer en jus !`, {key:'back_from_forest', once:false});
+      } else {
+        queueMsg('barista', `Tu es revenu les mains vides ? 😅 Retourne à la forêt cueillir des fruits !`, {key:'back_empty', once:false});
+      }
+    }
+    prevScene = scene;
+  }
+
+  // ── First customer ever ──
+  if(customers.length===1 && customers[0].status==='walk' && !msgShownKeys.has('first_customer')){
+    msgShownKeys.add('first_customer');
+    setTimeout(()=>{
+      queueMsg('barista', `Notre premier client arrive ! 🎉 Va vite à la forêt chercher des fruits si t'en as pas encore !`, {key:'fc'});
+    }, 1200);
+  }
+
+  // ── Level up congrats ──
+  // (handled in serve logic — we'll wire it below)
+}
+
 document.getElementById('btn-play').addEventListener('click', ()=>{
   document.getElementById('welcome-screen').classList.add('hidden');
+  document.getElementById('shell').style.overflow='hidden';
   gameStarted = true;
+  scaleGame();
   setTimeout(()=>notify('🚛 Bienvenue ! Monte dans le camion pour aller à la forêt !'),600);
 });
 
@@ -262,21 +577,73 @@ fTreeDefs.forEach((d)=>{
 
 const fPlayer = {x:512,y:460,vx:0,vy:0,anim:0,facing:1};
 const keys = {};
-window.addEventListener('keydown',e=>{keys[e.key]=true;e.preventDefault();});
-window.addEventListener('keyup',e=>{keys[e.key]=false;});
+window.addEventListener('keydown',e=>{
+  const k = e.key.toLowerCase();
+  keys[e.key]=true;
+  keys[k]=true;
+  e.preventDefault();
+});
+window.addEventListener('keyup',e=>{
+  const k = e.key.toLowerCase();
+  keys[e.key]=false;
+  keys[k]=false;
+});
 
-// ── Panels ──
-let settingsOpen=false,stockOpen=false,trashOpen=false;
+let settingsOpen=false,stockOpen=false,trashOpen=false,pickerOpen=false;
 
 function closeAllPanels(){
-  settingsOpen=false;stockOpen=false;trashOpen=false;
+  settingsOpen=false;stockOpen=false;trashOpen=false;pickerOpen=false;
   document.getElementById('speed-panel').classList.add('hidden');
   document.getElementById('stock-panel').classList.add('hidden');
   document.getElementById('trash-confirm').classList.add('hidden');
+  document.getElementById('fruit-picker').classList.add('hidden');
   document.getElementById('btn-settings').classList.remove('active');
   document.getElementById('btn-stock').classList.remove('active');
   document.getElementById('btn-trash').classList.remove('active');
 }
+
+function openFruitPicker(){
+  // Build counts of fruits in basket
+  const counts={};
+  basket.forEach(k=>counts[k]=(counts[k]||0)+1);
+  const available=FRUITS.filter(f=>counts[f.key]>0);
+  if(!available.length)return;
+
+  // If only one kind, skip picker and blend immediately
+  if(available.length===1){
+    startBlend(available[0].key);
+    return;
+  }
+
+  closeAllPanels();
+  pickerOpen=true;
+  const container=document.getElementById('fp-options');
+  container.innerHTML='';
+  available.forEach(f=>{
+    const btn=document.createElement('button');
+    btn.className='fp-btn';
+    btn.innerHTML=`<span class="fp-em">${f.em}</span><span class="fp-label">${f.label}</span><span class="fp-count">x${counts[f.key]}</span>`;
+    btn.addEventListener('click',()=>{
+      closeAllPanels();
+      startBlend(f.key);
+    });
+    container.appendChild(btn);
+  });
+  document.getElementById('fruit-picker').classList.remove('hidden');
+}
+
+function startBlend(fruitKey){
+  const idx=basket.indexOf(fruitKey);
+  if(idx===-1)return;
+  basket.splice(idx,1);
+  blendFruit=fruitKey;
+  blending=true;blendTick=0;
+  const f=FRUITS.find(t=>t.key===fruitKey);
+  notify('⚡ Mixage de '+(f?f.label:fruitKey)+'…');
+  updateHUD();
+}
+
+document.getElementById('fp-cancel').addEventListener('click',()=>closeAllPanels());
 
 document.getElementById('btn-settings').addEventListener('click',()=>{
   const was=settingsOpen;closeAllPanels();
@@ -370,14 +737,25 @@ function switchScene(to,cb){
   },350);
 }
 
-function queuePos(i){
-  return{x:bar.x+110+Math.sin(i*0.35)*30,y:bar.y+180+i*48};
+// ── FIX: customers queue at a fixed Y near the bar, player can easily reach them ──
+// Customers stand in a row at y=490 (below the bar counter, on the ground level)
+function queuePos(slotIdx){
+  return{x:bar.x+80+slotIdx*60, y:490};
 }
 
-let qIdx=0;
 function mkCust(){
-  const idx=qIdx++;
-  return{x:W+60,y:bar.y+380,want:FRUITS[Math.floor(Math.random()*FRUITS.length)].key,spd:1.8,status:'walk',patience:120,timer:0,bob:Math.random()*Math.PI*2,hue:Math.floor(Math.random()*360),idx,happyT:0};
+  return{
+    x:W+60,
+    y:490,
+    want:FRUITS[Math.floor(Math.random()*FRUITS.length)].key,
+    spd:1.8,
+    status:'walk',
+    patience: PATIENCE_FRAMES,  // FIX: 50 seconds
+    timer:0,
+    bob:Math.random()*Math.PI*2,
+    hue:Math.floor(Math.random()*360),
+    happyT:0
+  };
 }
 
 function rr(x,y,w,h,r){
@@ -628,7 +1006,7 @@ function drawJuiceBar(){
   if(!player.inTruck&&dist(player,{x:bx+120,y:by+220})<90){
     gx.fillStyle='rgba(255,255,210,.97)';rr(bx+30,by-60,190,22,7);gx.fill();
     gx.fillStyle='#332200';gx.font='bold 11px Nunito';gx.textAlign='center';
-    if(!blending&&basket.length>0)gx.fillText('[E] Mixer les fruits !',bx+125,by-45);
+    if(!blending&&basket.length>0)gx.fillText('[E] Choisir un fruit à mixer !',bx+125,by-45);
     else if(blending)gx.fillText('En cours... ⚡',bx+125,by-45);
     else gx.fillText('Ramène des fruits !',bx+125,by-45);
     gx.textAlign='left';
@@ -742,7 +1120,7 @@ function drawPlayer(){
   gx.restore();
 }
 
-function drawCustomer(c){
+function drawCustomer(c, slotIdx){
   const bob=Math.sin(c.bob)*(c.status==='walk'?4.5:2);
   const leg=c.status==='walk'?Math.sin(c.bob*2)*14:0;
   const sx=c.x,sy=c.y+bob;
@@ -775,10 +1153,19 @@ function drawCustomer(c){
     const ft=FRUITS.find(t=>t.key===c.want);
     gx.textAlign='center';gx.textBaseline='middle';gx.font='16px serif';
     gx.fillText((ft?ft.em:'🍊')+' 🧃',sx,sy-91);gx.textAlign='left';gx.textBaseline='alphabetic';
-    if(!player.inTruck&&heldJuice===c.want&&dist(player,c)<80){
-      gx.fillStyle='rgba(255,255,210,.97)';rr(sx-44,sy-130,88,20,6);gx.fill();
-      gx.fillStyle='#332200';gx.font='bold 11px Nunito';gx.textAlign='center';
-      gx.fillText('[E] Servir ! 🍹jj',sx,sy-116);gx.textAlign='left';
+
+    // ── FIX: show serve hint for ANY customer with matching juice nearby ──
+    const playerNear = !player.inTruck && dist(player,{x:c.x,y:c.y})<120;
+    if(playerNear && heldJuice){
+      if(heldJuice===c.want){
+        gx.fillStyle='rgba(80,220,80,.97)';rr(sx-52,sy-138,104,24,7);gx.fill();
+        gx.fillStyle='#003300';gx.font='bold 12px Nunito';gx.textAlign='center';
+        gx.fillText('✅ [E] Servir ! 🍹',sx,sy-122);gx.textAlign='left';
+      } else {
+        gx.fillStyle='rgba(255,80,80,.85)';rr(sx-52,sy-138,104,20,7);gx.fill();
+        gx.fillStyle='#fff';gx.font='bold 10px Nunito';gx.textAlign='center';
+        gx.fillText('❌ Mauvais jus',sx,sy-124);gx.textAlign='left';
+      }
     }
   }
   if(c.status==='happy'){
@@ -926,15 +1313,25 @@ function updateTip(){
   if(player.inTruck)setTip('🚛 Conduis à GAUCHE vers le portail forêt — [E] pour sortir du camion');
   else if(!basket.length&&!heldJuice)setTip('🚛 Monte dans le camion [E] → conduis vers le portail 🌳 à gauche !');
   else if(basket.length>0&&!heldJuice){
-    if(dist(player,{x:bar.x+120,y:bar.y+220})<90)setTip('[E] Mixer tes fruits au Bar à Jus !');
+    if(dist(player,{x:bar.x+120,y:bar.y+220})<90)setTip('[E] Choisir un fruit à mixer au Bar à Jus !');
     else setTip('🏃 Ramène tes fruits au ⚡ Bar à Jus pour mixer !');
   }
   else if(blending)setTip('⚡ Mixage en cours…');
   else if(heldJuice){
     const f=FRUITS.find(t=>t.key===heldJuice);
-    setTip('🍹 Cherche le client qui veut du '+(f?f.label+' '+f.em:'jus')+' — [E] pour servir ! (🗑️ pour jeter)');
+    const match=customers.find(c=>c.status==='wait'&&c.want===heldJuice);
+    if(match)setTip('🍹 Client repéré ! Approche-toi et appuie [E] pour servir ! (🗑️ pour jeter)');
+    else setTip('🍹 Cherche le client qui veut du '+(f?f.label+' '+f.em:'jus')+' — [E] pour servir ! (🗑️ pour jeter)');
   }
   else setTip('Marche vers le 🚛 camion et appuie sur [E] pour monter !');
+}
+
+// ── FIX: key check helper ──
+function keyPressed(k){
+  return keys[k] || keys[k.toLowerCase()] || keys[k.toUpperCase()];
+}
+function consumeKey(k){
+  keys[k]=false;keys[k.toLowerCase()]=false;keys[k.toUpperCase()]=false;
 }
 
 function updateMain(){
@@ -961,34 +1358,69 @@ function updateMain(){
     player.x+=player.vx;player.y+=player.vy;
     player.x=Math.max(12,Math.min(W-12,player.x));
     player.y=Math.max(85,Math.min(H-32,player.y));
-    if(keys['e']||keys['E']){
-      keys['e']=false;keys['E']=false;
-      if(dist(player,{x:truck.x+65,y:truck.y+30})<85){player.inTruck=true;return;}
-      if(dist(player,{x:290,y:ROAD_Y+24})<70){switchScene('forest',()=>{fPlayer.x=512;fPlayer.y=460;});return;}
-      if(dist(player,{x:bar.x+120,y:bar.y+220})<95){
-        if(basket.length&&!blending&&!heldJuice){
-          blendFruit=basket[0];basket=basket.filter(f=>f!==blendFruit);
-          blending=true;blendTick=0;
-          const f=FRUITS.find(t=>t.key===blendFruit);
-          notify('⚡ Mixage de '+(f?f.label:blendFruit)+'…');
+
+    if(keyPressed('e')){
+      consumeKey('e');
+
+      // Close picker if open
+      if(pickerOpen){ closeAllPanels(); return; }
+
+      // Enter truck
+      if(dist(player,{x:truck.x+65,y:truck.y+30})<85){
+        player.inTruck=true;
+        return;
+      }
+
+      // Enter forest portal
+      if(dist(player,{x:290,y:ROAD_Y+24})<70){
+        switchScene('forest',()=>{fPlayer.x=512;fPlayer.y=460;});
+        return;
+      }
+
+      // ── FIX: Serve customer — use larger radius (120) and check all waiting customers ──
+      if(heldJuice){
+        let served=false;
+        for(let i=0;i<customers.length;i++){
+          const c=customers[i];
+          if(c.status==='wait' && dist(player,c)<120){
+            if(c.want===heldJuice){
+              const f=FRUITS.find(t=>t.key===c.want);
+              const pay=f?f.pay:10;
+              money+=pay;xp+=pay;
+              if(xp>=level*50){level++;xp=0;notify('⭐ Niveau supérieur ! Tu es niveau '+level+' !');}
+              floatAt(c.x,c.y-40,'+$'+pay,'#FFD700');
+              burst(c.x,c.y-30,'#FFD700');
+              heldJuice=null;c.status='happy';c.happyT=90;
+              updateHUD();served=true;
+              notify('🍹 Servi ! +$'+pay);
+              break;
+            } else {
+              // Wrong juice - show feedback
+              floatAt(c.x,c.y-40,'❌ Mauvais jus !','#FF4444');
+              notify('❌ Ce client ne veut pas ce jus !');
+              break;
+            }
+          }
+        }
+        if(!served){
+          // Try blender anyway if near bar
+          if(dist(player,{x:bar.x+120,y:bar.y+220})<95&&basket.length&&!blending){
+            openFruitPicker();
+          }
         }
         return;
       }
-      if(heldJuice&&customers.length){
-        let served=false;
-        customers.forEach((c)=>{
-          if(!served&&c.status==='wait'&&dist(player,c)<85&&c.want===heldJuice){
-            const f=FRUITS.find(t=>t.key===c.want);
-            const pay=f?f.pay:10;
-            money+=pay;xp+=pay;
-            if(xp>=level*50){level++;xp=0;notify('⭐ Niveau supérieur ! Tu es niveau '+level+' !');}
-            floatAt(c.x,c.y-40,'+$'+pay,'#FFD700');burst(c.x,c.y-30,'#FFD700');
-            heldJuice=null;c.status='happy';c.happyT=90;updateHUD();served=true;
-          }
-        });
+
+      // Use blender
+      if(dist(player,{x:bar.x+120,y:bar.y+220})<95){
+        if(basket.length&&!blending&&!heldJuice){
+          openFruitPicker();
+        }
+        return;
       }
     }
   }
+
   if(player.inTruck){
     let accel=0;
     if(keys['ArrowUp']||keys['w'])accel=1;
@@ -1003,8 +1435,9 @@ function updateMain(){
       scene='journey';journeyX=0;journeyActive=true;truck.speed=truck.maxSpeed*.7;
       notify('🚛 En route vers la forêt ! Maintiens ↑/W !');return;
     }
-    if(keys['e']||keys['E']){keys['e']=false;keys['E']=false;player.inTruck=false;truck.speed=0;}
+    if(keyPressed('e')){consumeKey('e');player.inTruck=false;truck.speed=0;}
   }
+
   custCD--;
   if(custCD<=0&&customers.length<5){customers.push(mkCust());custCD=200+Math.floor(Math.random()*120);}
   customers.forEach((c,i)=>{
@@ -1014,13 +1447,12 @@ function updateMain(){
       if(d>2){c.x+=dx2/d*c.spd*1.2;c.y+=dy2/d*c.spd;}
       else{c.x=qp.x;c.y=qp.y;c.status='wait';}
     }
-    if(c.status==='wait'){c.timer+=i===0?1/60:.2/60;if(c.timer>c.patience)c.status='leave';}
+    if(c.status==='wait'){c.timer+=1;if(c.timer>c.patience)c.status='leave';}
     if(c.status==='happy'){c.happyT--;if(c.happyT<=0)c.status='leave';}
     if(c.status==='leave')c.x+=c.spd*2.5;
     c.bob+=.12;
   });
   customers=customers.filter(c=>c.x<W+140);
-  if(customers.length===0)qIdx=0;
 }
 
 function updateJourney(){
@@ -1035,8 +1467,8 @@ function updateJourney(){
     switchScene('forest',()=>{fPlayer.x=512;fPlayer.y=460;player.inTruck=false;truck.speed=0;truck.x=380;});
     return;
   }
-  if(keys['e']||keys['E']){
-    keys['e']=false;keys['E']=false;
+  if(keyPressed('e')){
+    consumeKey('e');
     switchScene('main',()=>{player.inTruck=false;truck.speed=0;player.x=truck.x+65;player.y=ROAD_Y+30;});
   }
 }
@@ -1055,8 +1487,8 @@ function updateForest(){
   } else {fPlayer.vx*=.72;fPlayer.vy*=.72;}
   fPlayer.x+=fPlayer.vx;fPlayer.y+=fPlayer.vy;
   fPlayer.x=Math.max(14,Math.min(W-14,fPlayer.x));fPlayer.y=Math.max(80,Math.min(H-28,fPlayer.y));
-  if(keys['e']||keys['E']){
-    keys['e']=false;keys['E']=false;
+  if(keyPressed('e')){
+    consumeKey('e');
     const nearby=FOREST_TREES.find(t=>!t.harvested&&dist(fPlayer,{x:t.x,y:t.y+40})<72);
     if(nearby){
       for(let i=0;i<nearby.fruits;i++)basket.push(nearby.key);
@@ -1084,7 +1516,7 @@ function draw(){
   gx.clearRect(0,0,W,H);
   if(scene==='main'){
     drawSky();drawGround();drawForestSide();drawForestPortal();drawJuiceBar();
-    customers.forEach((c)=>drawCustomer(c));drawTruck();drawPlayer();drawParticles();
+    customers.forEach((c,i)=>drawCustomer(c,i));drawTruck();drawPlayer();drawParticles();
   } else if(scene==='journey'){drawJourneyScene();drawParticles();}
   else if(scene==='forest'){drawForestScene();drawParticles();}
 }
@@ -1093,10 +1525,21 @@ function loop(){update();draw();updateHUD();requestAnimationFrame(loop);}
 
 function scaleGame(){
   const shell=document.getElementById('shell');
-  const scaleX=window.innerWidth/1024,scaleY=window.innerHeight/620;
-  const scale=Math.max(scaleX,scaleY);
-  const offsetX=(window.innerWidth-1024*scale)/2,offsetY=(window.innerHeight-620*scale)/2;
+  const scaleX=window.innerWidth/1024;
+  const scaleY=window.innerHeight/620;
+  const scale=Math.min(scaleX,scaleY);
+  const offsetX=(window.innerWidth-1024*scale)/2;
+  const offsetY=(window.innerHeight-620*scale)/2;
   shell.style.transform=`translate(${offsetX}px,${offsetY}px) scale(${scale})`;
+  const ws=document.getElementById('welcome-screen');
+  if(ws&&!ws.classList.contains('hidden')){
+    const invScale=1/scale;
+    ws.style.transformOrigin='top left';
+    ws.style.width=(window.innerWidth*invScale)+'px';
+    ws.style.height=(window.innerHeight*invScale)+'px';
+    ws.style.left=(-offsetX*invScale)+'px';
+    ws.style.top=(-offsetY*invScale)+'px';
+  }
 }
 window.addEventListener('resize',scaleGame);
 scaleGame();
