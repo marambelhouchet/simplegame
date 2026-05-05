@@ -2,66 +2,94 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>🍊 Juice Farm</title>
+<title>🦁 Stil Land - Smoothies</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{width:100vw;height:100vh;overflow:hidden;background:linear-gradient(160deg,#1a5a08 0%,#2e8a14 40%,#FF8800 100%);font-family:'Nunito',sans-serif;user-select:none;}
+html,body{width:100vw;height:100vh;overflow:hidden;background:linear-gradient(160deg,#0d3a08 0%,#1a6a10 30%,#2a8a18 60%,#1a5a08 100%);font-family:'Nunito',sans-serif;user-select:none;}
 #shell{position:absolute;transform-origin:top left;width:1024px;height:620px;}
 canvas{display:block;width:1024px;height:620px;}
 
+/* ── SPLASH SCREEN ── */
+#splash-screen{
+  position:absolute;inset:0;z-index:200;
+  background:#000;
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
+  overflow:hidden;
+}
+#splash-screen.hidden{display:none;}
+#splash-bg{
+  position:absolute;inset:0;
+  background-image:url('assets/first_page.png');
+  background-size:cover;
+  background-position:center;
+}
+#btn-splash-play{
+  position:relative;z-index:2;
+  margin-bottom:36px;
+  background:none;
+  border:none;
+  cursor:pointer;
+  padding:0;
+  width:280px;
+  filter:drop-shadow(0 6px 24px rgba(0,0,0,.6));
+  transition:transform .14s, filter .14s;
+}
+#btn-splash-play:hover{transform:scale(1.08);filter:drop-shadow(0 10px 32px rgba(255,180,0,.5));}
+#btn-splash-play:active{transform:scale(.96);}
+#btn-splash-play img{width:100%;height:auto;display:block;}
+
+/* ── RULES SCREEN (second_page bg, blurred when modal open) ── */
 #welcome-screen{
-position:absolute;inset:0;z-index:100;
-background:linear-gradient(160deg,#1a5a08 0%,#2e8a14 40%,#FF8800 100%);
-display:flex;flex-direction:column;align-items:center;justify-content:center;
-overflow:hidden;padding:12px 0;
+  position:absolute;inset:0;z-index:100;
+  background-image:url('assets/first_page.png');
+  background-size:cover;background-position:center;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
 }
 #welcome-screen.hidden{display:none;}
-.ws-title{font-family:'Fredoka One',cursive;font-size:44px;color:#FFE044;
-text-shadow:0 4px 0 #AA4400,0 8px 24px rgba(0,0,0,.5);margin-bottom:2px;letter-spacing:2px;}
-.ws-sub{font-family:'Fredoka One',cursive;font-size:15px;color:rgba(255,255,220,.85);
-margin-bottom:8px;letter-spacing:1px;}
-.ws-box{
-background:rgba(0,0,0,.55);border-radius:18px;
-border:2px solid rgba(255,220,80,.35);
-padding:10px 22px;max-width:820px;width:92%;margin-bottom:8px;
+
+/* Blur overlay behind modal */
+#ws-blur{
+  position:absolute;inset:0;
+  background:rgba(0,0,0,0);
+  backdrop-filter:blur(0px);
+  transition:backdrop-filter .4s ease, background .4s ease;
+  z-index:1;
 }
-.ws-box h2{font-family:'Fredoka One',cursive;font-size:17px;color:#FFD700;margin-bottom:10px;text-align:center;letter-spacing:.5px;}
-.ws-steps{display:grid;grid-template-columns:1fr 1fr;gap:7px 16px;}
-.ws-step{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:#eee;line-height:1.4;}
-.ws-num{
-min-width:22px;height:22px;border-radius:50%;
-background:linear-gradient(135deg,#FF9500,#FF5500);
-display:flex;align-items:center;justify-content:center;
-font-family:'Fredoka One',cursive;font-size:12px;color:#fff;
-margin-top:1px;flex-shrink:0;
+#ws-blur.active{
+  backdrop-filter:blur(6px);
+  background:rgba(0,0,0,0.35);
 }
-.ws-controls{
-background:rgba(0,0,0,.45);border-radius:12px;
-border:1px solid rgba(255,255,255,.15);
-padding:8px 16px;max-width:820px;width:92%;margin-bottom:8px;
-display:flex;gap:12px;flex-wrap:wrap;justify-content:center;
+
+/* HOW TO PLAY modal card */
+#ws-modal{
+  position:relative;z-index:2;
+  display:flex;flex-direction:column;align-items:center;
+  opacity:0;transform:scale(0.88);
+  transition:opacity .35s ease, transform .35s cubic-bezier(.34,1.56,.64,1);
+  pointer-events:none;
 }
-.ws-key{display:flex;align-items:center;gap:6px;font-size:11px;color:#ddd;}
-.key-badge{
-background:rgba(255,255,255,.18);border:1.5px solid rgba(255,255,255,.3);
-border-radius:7px;padding:2px 8px;font-family:'Fredoka One',cursive;font-size:12px;color:#fff;
+#ws-modal.visible{
+  opacity:1;transform:scale(1);pointer-events:auto;
 }
-.ws-goal{
-background:rgba(255,200,50,.15);border:1.5px solid rgba(255,200,50,.35);
-border-radius:12px;padding:8px 20px;max-width:820px;width:92%;
-font-family:'Fredoka One',cursive;font-size:13px;color:#FFE066;
-text-align:center;margin-bottom:12px;
+#ws-modal-img{
+  margin-top:100px;
+  width:700px;max-width:95vw;
+  filter:drop-shadow(0 16px 48px rgba(0,0,0,0.7));
+  display:block;}
+
+/* SKIP button */
+#btn-skip{
+  margin-top:-85px;
+  background:none;border:none;cursor:pointer;padding:0;
+  width:220px;
+  filter:drop-shadow(0 4px 18px rgba(0,0,0,.55));
+  transition:transform .14s,filter .14s;
 }
-#btn-play{
-font-family:'Fredoka One',cursive;font-size:22px;color:#fff;
-background:linear-gradient(135deg,#FF7700,#FF3300);
-border:none;border-radius:50px;padding:12px 56px;cursor:pointer;
-box-shadow:0 6px 0 #AA2200,0 8px 28px rgba(0,0,0,.4);
-transition:transform .12s,box-shadow .12s;letter-spacing:1px;
-}
-#btn-play:hover{transform:scale(1.06) translateY(-2px);box-shadow:0 9px 0 #AA2200,0 12px 32px rgba(0,0,0,.45);}
-#btn-play:active{transform:scale(.97) translateY(3px);box-shadow:0 3px 0 #AA2200;}
+#btn-skip:hover{transform:scale(1.08);filter:drop-shadow(0 8px 28px rgba(255,160,0,.5));}
+#btn-skip:active{transform:scale(.95);}
+#btn-skip img{width:100%;height:auto;display:block;}
 
 #hud{position:absolute;top:12px;left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:0 16px;z-index:20;pointer-events:none}
 .pill{display:flex;align-items:center;gap:7px;padding:8px 20px;border-radius:50px;font-family:'Fredoka One',cursive;font-size:20px;box-shadow:0 4px 14px rgba(0,0,0,.35);border:3px solid rgba(255,255,255,.4)}
@@ -188,8 +216,8 @@ transition:transform .2s cubic-bezier(.34,1.56,.64,1),opacity .15s;
 }
 #msg-avatar{
   width:44px;height:44px;border-radius:50%;
-  background:rgba(255,255,255,.12);
-  border:2px solid rgba(255,210,80,.4);
+  background:linear-gradient(135deg,#C8841A,#7a3808);
+  border:2px solid rgba(255,210,80,.6);
   display:flex;align-items:center;justify-content:center;
   font-size:24px;flex-shrink:0;
   box-shadow:0 2px 10px rgba(0,0,0,.4);
@@ -243,45 +271,22 @@ transition:transform .2s cubic-bezier(.34,1.56,.64,1),opacity .15s;
 <div id="shell">
 <canvas id="c" width="1024" height="620"></canvas>
 
-<div id="welcome-screen">
-  <div class="ws-title">🍊 Juice Farm</div>
-  <div class="ws-sub">Le jeu du fermier-juicier !</div>
-
-  <div class="ws-box">
-    <h2>🎯 But du jeu</h2>
-    <p style="font-size:13px;color:#ddd;text-align:center;line-height:1.6;">
-      Tu gères une ferme à jus ! Récupère des fruits dans la forêt, prépare des jus au bar,
-      et sers les clients avant qu'ils ne perdent patience.
-      Gagne de l'argent, monte en niveau et deviens le meilleur juicier de la région !
-    </p>
-  </div>
-
-  <div class="ws-box">
-    <h2>📋 Comment jouer ?</h2>
-    <div class="ws-steps">
-      <div class="ws-step"><div class="ws-num">1</div><div>Monte dans le <b style="color:#FFE066">camion 🚛</b> et conduis vers le portail de la forêt à gauche.</div></div>
-      <div class="ws-step"><div class="ws-num">2</div><div>Dans la forêt, marche vers un arbre et cueille des <b style="color:#FFE066">fruits 🍊</b>.</div></div>
-      <div class="ws-step"><div class="ws-num">3</div><div>Retourne au bar et utilise le <b style="color:#FFE066">blender ⚡</b> pour préparer un jus.</div></div>
-      <div class="ws-step"><div class="ws-num">4</div><div>Sers le jus au <b style="color:#FFE066">client 👤</b> qui le demande avant que sa patience ne s'épuise !</div></div>
-      <div class="ws-step"><div class="ws-num">5</div><div>Si tu as préparé le <b style="color:#FFE066">mauvais jus 🗑️</b>, clique sur la poubelle en haut à droite pour le jeter.</div></div>
-      <div class="ws-step"><div class="ws-num">6</div><div>Chaque vente rapporte de l'<b style="color:#FFE066">argent 💰</b> et de l'XP pour monter en niveau !</div></div>
-    </div>
-  </div>
-
-  <div class="ws-controls">
-    <div class="ws-key"><span class="key-badge">↑ W</span> Avancer / Accélérer</div>
-    <div class="ws-key"><span class="key-badge">← → A D</span> Se déplacer / Diriger</div>
-    <div class="ws-key"><span class="key-badge">↓ S</span> Reculer / Freiner</div>
-    <div class="ws-key"><span class="key-badge">E</span> Interagir (monter, cueillir, servir…)</div>
-  </div>
-
-  <div class="ws-goal">
-    🏆 Objectif : Accumule un maximum d'argent et atteins le niveau 10 !
-  </div>
-
-  <button id="btn-play">🍹 Jouer !</button>
+<div id="splash-screen">
+  <div id="splash-bg"></div>
+  <button id="btn-splash-play">
+    <img src="assets/playbutton.png" alt="PLAY">
+  </button>
 </div>
 
+<div id="welcome-screen" class="hidden">
+  <div id="ws-blur"></div>
+  <div id="ws-modal">
+    <img id="ws-modal-img" src="assets/_image.png" alt="How to Play">
+    <button id="btn-skip">
+      <img src="assets/bouton_skip.png" alt="SKIP">
+    </button>
+  </div>
+</div>
 <div id="hud">
   <div class="pill pg">💰 <span id="hM">$0</span></div>
   <div class="pill pp">⭐ Niv <span id="hL">1</span> &nbsp;|&nbsp; 🧺 <span id="hB">0</span></div>
@@ -323,7 +328,7 @@ transition:transform .2s cubic-bezier(.34,1.56,.64,1),opacity .15s;
 </div>
 
 <div id="msg-box" class="msg-hidden">
-  <div id="msg-avatar">👨‍🍳</div>
+  <div id="msg-avatar">🦁</div>
   <div id="msg-body">
     <div id="msg-name">Barista</div>
     <div id="msg-text"></div>
@@ -540,7 +545,25 @@ function updateContextualMessages(){
   // (handled in serve logic — we'll wire it below)
 }
 
-document.getElementById('btn-play').addEventListener('click', ()=>{
+// Splash PLAY → blur first_page + show How To Play modal on top
+document.getElementById('btn-splash-play').addEventListener('click', ()=>{
+  // Show welcome-screen (same first_page bg) over splash
+  const ws = document.getElementById('welcome-screen');
+  ws.classList.remove('hidden');
+  // Hide splash so welcome-screen (same bg) shows through
+  document.getElementById('splash-screen').classList.add('hidden');
+  scaleGame();
+  // trigger blur + modal animation on next frame
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{
+      document.getElementById('ws-blur').classList.add('active');
+      document.getElementById('ws-modal').classList.add('visible');
+    });
+  });
+});
+
+// SKIP → start game
+document.getElementById('btn-skip').addEventListener('click', ()=>{
   document.getElementById('welcome-screen').classList.add('hidden');
   document.getElementById('shell').style.overflow='hidden';
   gameStarted = true;
@@ -873,52 +896,117 @@ function drawTruckAt(x,y){
 }
 
 function drawSky(){
+  // Rich blue sky gradient like the Stil Land image
   const sky=gx.createLinearGradient(0,0,0,H);
-  sky.addColorStop(0,'#5CB8E8');sky.addColorStop(0.55,'#90D4F0');
-  sky.addColorStop(0.68,'#B8E88A');sky.addColorStop(1,'#5EB840');
+  sky.addColorStop(0,'#1a78C8');sky.addColorStop(0.3,'#4AA8E8');
+  sky.addColorStop(0.55,'#82CCEE');sky.addColorStop(0.68,'#A8DFA0');sky.addColorStop(1,'#5DC840');
   gx.fillStyle=sky;gx.fillRect(0,0,W,H);
-  gx.fillStyle='rgba(255,240,80,.18)';gx.beginPath();gx.arc(940,68,80,0,Math.PI*2);gx.fill();
-  gx.fillStyle='#FFE044';gx.beginPath();gx.arc(940,68,44,0,Math.PI*2);gx.fill();
-  [[140,58,1.1],[360,44,.9],[600,52,1],[800,40,.8]].forEach(([cx,cy,s])=>{
-    gx.fillStyle='rgba(255,255,255,.92)';
-    gx.beginPath();gx.arc(cx,cy,40*s,0,Math.PI*2);gx.fill();
-    gx.beginPath();gx.arc(cx-28*s,cy+10,26*s,0,Math.PI*2);gx.fill();
-    gx.beginPath();gx.arc(cx+28*s,cy+10,24*s,0,Math.PI*2);gx.fill();
-  });
+  // Sun with glow
+  gx.fillStyle='rgba(255,240,120,.22)';gx.beginPath();gx.arc(860,70,90,0,Math.PI*2);gx.fill();
+  gx.fillStyle='rgba(255,235,100,.38)';gx.beginPath();gx.arc(860,70,65,0,Math.PI*2);gx.fill();
+  gx.fillStyle='#FFE044';gx.beginPath();gx.arc(860,70,42,0,Math.PI*2);gx.fill();
+  gx.fillStyle='#FFF088';gx.beginPath();gx.arc(852,62,18,0,Math.PI*2);gx.fill();
+  // Detailed clouds like the image - puffy and white
+  function drawCloud(cx,cy,s,alpha){
+    gx.fillStyle=`rgba(255,255,255,${alpha})`;
+    [[0,0,44],[- 34,12,30],[34,14,28],[- 58,22,22],[58,24,20],[20,20,32],[-20,22,26]].forEach(([ox,oy,r])=>{
+      gx.beginPath();gx.arc(cx+ox*s,cy+oy*s,r*s,0,Math.PI*2);gx.fill();
+    });
+  }
+  drawCloud(160,52,1.1,.96);drawCloud(420,38,.92,.94);drawCloud(660,58,.98,.95);
+  drawCloud(790,44,.78,.9);drawCloud(980,62,.85,.93);drawCloud(50,78,.65,.8);
+  // Distant barn like in the Stil Land image
+  const bHorizon=ROAD_Y-90;
+  gx.fillStyle='#8B2810';rr(680,bHorizon-30,60,38,2);gx.fill();
+  gx.fillStyle='#AA3418';rr(681,bHorizon-31,58,10,2);gx.fill();
+  // Barn roof
+  gx.fillStyle='#6B1808';gx.beginPath();gx.moveTo(677,bHorizon-30);gx.lineTo(710,bHorizon-60);gx.lineTo(743,bHorizon-30);gx.closePath();gx.fill();
+  gx.fillStyle='#5a1406';gx.beginPath();gx.moveTo(677,bHorizon-30);gx.lineTo(710,bHorizon-60);gx.lineTo(712,bHorizon-60);gx.lineTo(679,bHorizon-30);gx.fill();
+  // Barn door
+  gx.fillStyle='#5a1a08';rr(702,bHorizon-18,16,20,2);gx.fill();
+  // Windmill in distance
+  gx.fillStyle='#CC9060';gx.fillRect(760,bHorizon-50,7,58);
+  gx.fillStyle='#B07040';rr(758,bHorizon-55,11,12,3);gx.fill();
+  // Windmill blades
+  const windAngle=tick*.015;
+  gx.save();gx.translate(763,bHorizon-52);
+  for(let wi=0;wi<4;wi++){
+    gx.save();gx.rotate(windAngle+wi*Math.PI/2);
+    gx.fillStyle='rgba(200,160,90,.9)';gx.fillRect(-2,-22,5,18);gx.restore();
+  }
+  gx.restore();
 }
 
 function drawGround(){
-  gx.fillStyle='#4EA828';gx.fillRect(0,ROAD_Y-8,W,H-ROAD_Y+8);
-  gx.fillStyle='#AAA090';gx.fillRect(0,ROAD_Y,W,ROAD_H);
-  gx.fillStyle='#C8B898';gx.fillRect(0,ROAD_Y,W,5);gx.fillRect(0,ROAD_Y+ROAD_H-5,W,5);
-  gx.fillStyle='rgba(255,255,255,.45)';
-  for(let rx=0;rx<W;rx+=60)gx.fillRect(rx+5,ROAD_Y+ROAD_H/2-3,36,6);
-  for(let gp=0;gp<W;gp+=18){
+  // Rich green grass gradient
+  const grassGrad=gx.createLinearGradient(0,ROAD_Y-8,0,H);
+  grassGrad.addColorStop(0,'#4CAE22');grassGrad.addColorStop(0.3,'#3A9A18');grassGrad.addColorStop(1,'#2A7A10');
+  gx.fillStyle=grassGrad;gx.fillRect(0,ROAD_Y-8,W,H-ROAD_Y+8);
+  // Dirt path like in the image - warm brown with ruts
+  const dirtGrad=gx.createLinearGradient(0,ROAD_Y,0,ROAD_Y+ROAD_H);
+  dirtGrad.addColorStop(0,'#C8A070');dirtGrad.addColorStop(0.4,'#B88C5A');dirtGrad.addColorStop(1,'#A07840');
+  gx.fillStyle=dirtGrad;gx.fillRect(0,ROAD_Y,W,ROAD_H);
+  // Path edge highlights
+  gx.fillStyle='#D4AC82';gx.fillRect(0,ROAD_Y,W,4);
+  gx.fillStyle='#8A6030';gx.fillRect(0,ROAD_Y+ROAD_H-3,W,3);
+  // Tire ruts / tracks
+  gx.strokeStyle='rgba(100,70,30,.35)';gx.lineWidth=3;
+  gx.beginPath();gx.moveTo(0,ROAD_Y+12);gx.lineTo(W,ROAD_Y+12);gx.stroke();
+  gx.beginPath();gx.moveTo(0,ROAD_Y+ROAD_H-12);gx.lineTo(W,ROAD_Y+ROAD_H-12);gx.stroke();
+  // Small stones/pebbles on path
+  [[80,ROAD_Y+18],[200,ROAD_Y+30],[350,ROAD_Y+22],[500,ROAD_Y+36],[680,ROAD_Y+20],[820,ROAD_Y+34],[950,ROAD_Y+25]].forEach(([px,py])=>{
+    gx.fillStyle='rgba(140,110,70,.6)';gx.beginPath();gx.ellipse(px,py,4,2.5,Math.random()*.5,0,Math.PI*2);gx.fill();
+  });
+  // Grass tufts on edges
+  for(let gp=0;gp<W;gp+=14){
     const gh=5+Math.sin(gp*.35+tick*.014)*2.5;
-    gx.fillStyle='#44BB22';gx.fillRect(gp,ROAD_Y-gh,8,gh);gx.fillRect(gp,ROAD_Y+ROAD_H,8,gh);
+    // Above road
+    gx.fillStyle=gp%28===0?'#5ACC30':'#48BB22';
+    gx.beginPath();gx.moveTo(gp,ROAD_Y-1);gx.lineTo(gp+4,ROAD_Y-gh-2);gx.lineTo(gp+7,ROAD_Y-1);gx.fill();
+    // Below road
+    gx.fillStyle=gp%28===0?'#5ACC30':'#48BB22';
+    gx.beginPath();gx.moveTo(gp,ROAD_Y+ROAD_H+1);gx.lineTo(gp+4,ROAD_Y+ROAD_H+gh+2);gx.lineTo(gp+7,ROAD_Y+ROAD_H+1);gx.fill();
   }
-  [[100,490],[250,540],[600,510],[820,490],[950,545],[70,555],[450,560]].forEach(([fx,fy])=>{gx.fillStyle='#fff';gx.font='12px serif';gx.textAlign='center';gx.fillText('❀',fx,fy);});
-  for(let fp=0;fp<W;fp+=90){
-    gx.fillStyle='#AA8855';gx.fillRect(fp,ROAD_Y-28,8,28);
-    gx.fillStyle='#CC9966';gx.fillRect(fp-2,ROAD_Y-36,12,12);
+  // Colorful flowers on the ground (like Stil Land image)
+  [[110,495,'#FF6688'],[260,545,'#FFAACC'],[590,515,'#FF88AA'],[800,495,'#FFD0E0'],[960,545,'#FF9988'],
+   [75,558,'#FFCC44'],[450,562,'#FF8866'],[700,538,'#AADDFF'],[140,520,'#88FFCC']].forEach(([fx,fy,col])=>{
+    gx.fillStyle=col;gx.font='13px serif';gx.textAlign='center';gx.fillText('❀',fx,fy);
+  });
+  // Fence posts along road like in the image
+  for(let fp=0;fp<W;fp+=70){
+    gx.fillStyle='#9B6A30';gx.fillRect(fp,ROAD_Y-32,10,32);
+    gx.fillStyle='#B8813A';gx.fillRect(fp,ROAD_Y-38,14,10);
+    // Horizontal fence rails
+    if(fp>0){
+      gx.fillStyle='#C8904A';gx.fillRect(fp-60,ROAD_Y-28,62,5);
+      gx.fillStyle='#C8904A';gx.fillRect(fp-60,ROAD_Y-14,62,5);
+    }
   }
-  gx.strokeStyle='#886644';gx.lineWidth=2.5;gx.beginPath();
-  for(let fp=0;fp<W;fp+=90){if(fp===0)gx.moveTo(fp+4,ROAD_Y-24);else gx.lineTo(fp+4,ROAD_Y-24+Math.sin(fp*.07)*5);}
-  gx.stroke();
+  gx.textAlign='left';
 }
 
 function drawForestSide(){
-  const grad=gx.createLinearGradient(0,0,300,0);
-  grad.addColorStop(0,'rgba(10,40,10,.65)');grad.addColorStop(1,'rgba(10,40,10,0)');
-  gx.fillStyle=grad;gx.fillRect(0,0,300,ROAD_Y);
-  drawBigTreeAt(80,310,1.4,'#2a7a18','#1d5c10','#BB5511');
-  drawBigTreeAt(200,280,1.6,'#1e6a12','#145008','#AA4A08');
-  drawBigTreeAt(340,295,1.2,'#258a1a','#186010','#CC6622');
-  drawBigTreeFruits(80,310,1.4);drawBigTreeFruits(200,280,1.6);drawBigTreeFruits(340,295,1.2);
-  gx.fillStyle='#7a4a18';gx.fillRect(285,340,10,70);
-  gx.fillStyle='#C8883A';rr(225,310,150,34,6);gx.fill();
-  gx.fillStyle='#5a2800';gx.font='bold 15px Nunito';gx.textAlign='center';
-  gx.fillText('🌲 BOIS FRUITIER',300,332);gx.textAlign='left';
+  // Dense forest gradient on left side
+  const grad=gx.createLinearGradient(0,0,360,0);
+  grad.addColorStop(0,'rgba(8,32,8,.75)');grad.addColorStop(0.6,'rgba(10,40,10,.4)');grad.addColorStop(1,'rgba(10,40,10,0)');
+  gx.fillStyle=grad;gx.fillRect(0,0,360,ROAD_Y);
+  // Multiple layered trees for depth
+  drawBigTreeAt(60,300,1.5,'#1e6a12','#145008','#9a4808');
+  drawBigTreeAt(170,270,1.7,'#2a7a18','#1d5c10','#8a3808');
+  drawBigTreeAt(300,285,1.3,'#258a1a','#186010','#b05010');
+  drawBigTreeAt(130,330,0.9,'#1a5c10','#103808','#884408');
+  drawBigTreeFruits(60,300,1.5);drawBigTreeFruits(170,270,1.7);drawBigTreeFruits(300,285,1.3);
+  // Stil Land sign like in the image
+  gx.fillStyle='#6B3A10';rr(210,330,168,44,8);gx.fill();
+  gx.fillStyle='#8B5A20';rr(210,330,168,12,5);gx.fill();
+  gx.fillStyle='#C8883A';rr(210,330,168,8,5);gx.fill();
+  gx.fillStyle='#4a1800';gx.font='bold 18px Fredoka One,cursive';gx.textAlign='center';
+  gx.fillText('🌿 Stil Land',294,355);
+  gx.fillStyle='#7a3a10';gx.font='bold 11px Nunito';
+  gx.fillText('Ferme & Marché',294,370);gx.textAlign='left';
+  // Sign post
+  gx.fillStyle='#7a4a18';gx.fillRect(284,374,10,36);
+  gx.fillStyle='#9B6030';gx.fillRect(282,376,4,32);
 }
 
 function drawBigTreeFruits(x,y,s){
@@ -944,8 +1032,8 @@ function drawJuiceBar(){
   gx.strokeStyle='#7A4A1A';gx.lineWidth=3;rr(bx+20,by+70,190,105,6);gx.stroke();
   gx.fillStyle='#C8883A';rr(bx+10,by+45,220,42,8);gx.fill();
   gx.strokeStyle='#8B5A20';gx.lineWidth=3;rr(bx+10,by+45,220,42,8);gx.stroke();
-  gx.fillStyle='#5A2800';gx.font='bold 26px Fredoka One,cursive';gx.textAlign='center';
-  gx.fillText('BAR À JUS',bx+120,by+75);gx.textAlign='left';
+  gx.fillStyle='#3a1800';gx.font='bold 22px Fredoka One,cursive';gx.textAlign='center';
+  gx.fillText('🥤 SMOOTHIES',bx+120,by+75);gx.textAlign='left';
   gx.textAlign='center';gx.textBaseline='middle';gx.font='52px serif';
   gx.fillText('🥤',bx+120,by+14);gx.textAlign='left';gx.textBaseline='alphabetic';
   gx.fillStyle='#CC3311';
@@ -995,6 +1083,13 @@ function drawJuiceBar(){
   gx.textAlign='left';
   drawPot(bx+248,by+218,'#3a8a1a');
   drawBarista(bx+120,by+105);
+  // 100% NATUREL sign like in the Stil Land image
+  gx.fillStyle='#2a6a18';rr(bx+168,by+195,72,40,8);gx.fill();
+  gx.strokeStyle='#1a4a10';gx.lineWidth=2;rr(bx+168,by+195,72,40,8);gx.stroke();
+  gx.fillStyle='#AAFFAA';gx.font='bold 9px Fredoka One,cursive';gx.textAlign='center';
+  gx.fillText('100%',bx+204,by+212);
+  gx.fillStyle='#FFFFFF';gx.font='bold 11px Fredoka One,cursive';
+  gx.fillText('🌿 NATUREL',bx+204,by+228);gx.textAlign='left';
   if(heldJuice){
     const f=FRUITS.find(t=>t.key===heldJuice);
     gx.textAlign='center';gx.textBaseline='middle';
@@ -1081,30 +1176,92 @@ function drawTruck(){
   }
 }
 
+function drawLionCharacter(gx2, x, y, facing, anim, mov, isForest){
+  const bob=Math.sin(anim)*3.5;
+  const leg=Math.sin(anim*2)*16;
+  const sc = isForest ? 1 : 1;
+  // Shadow
+  gx2.fillStyle='rgba(0,0,0,.18)';gx2.beginPath();gx2.ellipse(x,y+15,15*sc,5,0,0,Math.PI*2);gx2.fill();
+  gx2.save();gx2.translate(x,y+bob);gx2.scale(facing*sc,sc);
+  // Legs (brown pants)
+  [[-7,leg],[7,-leg]].forEach(([lx,r])=>{
+    gx2.save();gx2.translate(lx,14);gx2.rotate(r*Math.PI/180);
+    gx2.fillStyle='#7A4A18';gx2.fillRect(-4.5,0,9,18);
+    // Boots
+    gx2.fillStyle='#3a1a08';rr(-5,15,11,7,2);gx2.fill();gx2.restore();
+  });
+  // Body - brown overalls
+  gx2.fillStyle='#8B5A1A';rr(-13,-22,26,30,7);gx2.fill();
+  // Overalls detail/straps
+  gx2.fillStyle='#7A4A12';rr(-10,-18,8,24,3);gx2.fill();
+  gx2.fillStyle='#C68E2A';rr(-12,-22,24,8,4);gx2.fill();
+  // Belt
+  gx2.fillStyle='#4a2a08';rr(-12,4,24,5,2);gx2.fill();
+  gx2.fillStyle='#D4A844';rr(-4,4,8,5,1);gx2.fill();
+  // Stil badge on chest
+  gx2.fillStyle='#FFD700';gx2.beginPath();gx2.arc(-2,-10,5,0,Math.PI*2);gx2.fill();
+  gx2.fillStyle='#2a6a18';gx2.font='bold 5px Arial';gx2.textAlign='center';gx2.textBaseline='middle';gx2.fillText('S',- 2,-10);gx2.textAlign='left';gx2.textBaseline='alphabetic';
+  // Arms
+  gx2.save();gx2.translate(-16,-10);gx2.rotate(mov?-leg*.026:-.32);
+  gx2.fillStyle='#C8841A';gx2.fillRect(-4,0,8,16);
+  gx2.fillStyle='#D89030';gx2.beginPath();gx2.arc(0,16,4.5,0,Math.PI*2);gx2.fill();
+  gx2.restore();
+  gx2.save();gx2.translate(16,-10);gx2.rotate(mov?leg*.026:.32);
+  gx2.fillStyle='#C8841A';gx2.fillRect(-4,0,8,16);
+  gx2.fillStyle='#D89030';gx2.beginPath();gx2.arc(0,16,4.5,0,Math.PI*2);gx2.fill();
+  gx2.restore();
+  // Mane (big fluffy lion mane - main feature!)
+  const maneC='#7a3808';
+  gx2.fillStyle=maneC+'CC';gx2.beginPath();gx2.arc(0,-34,18,0,Math.PI*2);gx2.fill();
+  // Mane spiky outer ring
+  for(let i=0;i<12;i++){
+    const a=(i/12)*Math.PI*2;
+    const mr=16+Math.sin(tick*.04+i)*1.5;
+    gx2.fillStyle=i%2===0?'#8B4410':'#6a2c08';
+    gx2.beginPath();gx2.arc(Math.cos(a)*mr,-34+Math.sin(a)*mr,5+Math.sin(tick*.03+i)*.5,0,Math.PI*2);gx2.fill();
+  }
+  // Face - golden lion
+  gx2.fillStyle='#D4913A';gx2.beginPath();gx2.arc(0,-36,13,0,Math.PI*2);gx2.fill();
+  // Face shading
+  gx2.fillStyle='#E8A850';gx2.beginPath();gx2.arc(2,-36,10,0,Math.PI*2);gx2.fill();
+  // Snout/muzzle area
+  gx2.fillStyle='#F0C878';gx2.beginPath();gx2.ellipse(0,-31,7,5,0,0,Math.PI*2);gx2.fill();
+  // Straw hat
+  gx2.fillStyle='#D4B866';gx2.beginPath();gx2.ellipse(0,-48,16,5,0,0,Math.PI*2);gx2.fill();
+  gx2.fillStyle='#C8A840';rr(-10,-53,20,8,3);gx2.fill();
+  // Hat band
+  gx2.fillStyle='#2a6a18';rr(-10,-51,20,4,2);gx2.fill();
+  // Hat "Stil" text on band
+  gx2.fillStyle='#FFD700';gx2.font='bold 4px Arial';gx2.textAlign='center';gx2.textBaseline='middle';gx2.fillText('Stil',-0,-49);gx2.textAlign='left';gx2.textBaseline='alphabetic';
+  // Eyes
+  gx2.fillStyle='#1a0a00';gx2.beginPath();gx2.arc(-4,-37,2.2,0,Math.PI*2);gx2.fill();gx2.beginPath();gx2.arc(4,-37,2.2,0,Math.PI*2);gx2.fill();
+  gx2.fillStyle='#fff';gx2.beginPath();gx2.arc(-3.2,-37.8,.9,0,Math.PI*2);gx2.fill();gx2.beginPath();gx2.arc(4.8,-37.8,.9,0,Math.PI*2);gx2.fill();
+  // Nose
+  gx2.fillStyle='#3a1808';gx2.beginPath();gx2.ellipse(0,-33,2.5,1.8,0,0,Math.PI*2);gx2.fill();
+  // Smile
+  gx2.strokeStyle='#6a2808';gx2.lineWidth=1.5;gx2.lineCap='round';gx2.beginPath();gx2.arc(0,-29,3.5,.15,Math.PI-.15);gx2.stroke();
+  // Whiskers
+  gx2.strokeStyle='rgba(255,220,150,.8)';gx2.lineWidth=0.8;
+  [[-4,-32,-12,-30],[4,-32,12,-30],[-4,-33,-11,-34],[4,-33,11,-34]].forEach(([x1,y1,x2,y2])=>{gx2.beginPath();gx2.moveTo(x1,y1);gx2.lineTo(x2,y2);gx2.stroke();});
+  // Ears (lion ears above mane)
+  [[-11,-46],[11,-46]].forEach(([ex,ey])=>{
+    gx2.fillStyle='#8B4410';gx2.beginPath();gx2.arc(ex,ey,5,0,Math.PI*2);gx2.fill();
+    gx2.fillStyle='#D4913A';gx2.beginPath();gx2.arc(ex,ey,3,0,Math.PI*2);gx2.fill();
+  });
+  gx2.restore();
+}
+
 function drawPlayer(){
   if(player.inTruck)return;
   const{x,y,facing,anim}=player;
   const bob=Math.sin(anim)*3.5;
-  const leg=Math.sin(anim*2)*16;
   const mov=Math.abs(player.vx)>.1||Math.abs(player.vy)>.1;
-  gx.fillStyle='rgba(0,0,0,.15)';gx.beginPath();gx.ellipse(x,y+14,13,4.5,0,0,Math.PI*2);gx.fill();
-  gx.save();gx.translate(x,y+bob);gx.scale(facing,1);
-  [[-6,leg],[6,-leg]].forEach(([lx,r])=>{
-    gx.save();gx.translate(lx,12);gx.rotate(r*Math.PI/180);
-    gx.fillStyle='#3355CC';gx.fillRect(-4,0,8,16);
-    gx.fillStyle='#111';rr(-4.5,13,9,6,2);gx.fill();gx.restore();
-  });
-  gx.fillStyle=`hsl(${player.hue},65%,38%)`;rr(-11,-20,22,26,6);gx.fill();
-  gx.fillStyle=`hsl(${player.hue},65%,56%)`;rr(-8,-16,8,8,3);gx.fill();
-  gx.save();gx.translate(-15,-8);gx.rotate(mov?-leg*.026:-.28);gx.fillStyle='#FFCC88';gx.fillRect(-3.5,0,7,14);gx.restore();
-  gx.save();gx.translate(15,-8);gx.rotate(mov?leg*.026:.28);gx.fillStyle='#FFCC88';gx.fillRect(-3.5,0,7,14);gx.restore();
-  gx.fillStyle='#FFCC88';gx.beginPath();gx.arc(0,-28,13,0,Math.PI*2);gx.fill();
-  gx.fillStyle='#3a1a0a';gx.beginPath();gx.ellipse(0,-37,12,6,0,Math.PI,Math.PI*2);gx.fill();
-  gx.fillStyle='#222';gx.beginPath();gx.arc(-4,-29,2,0,Math.PI*2);gx.fill();gx.beginPath();gx.arc(4,-29,2,0,Math.PI*2);gx.fill();
-  gx.fillStyle='#fff';gx.beginPath();gx.arc(-3.2,-30,.9,0,Math.PI*2);gx.fill();gx.beginPath();gx.arc(4.8,-30,.9,0,Math.PI*2);gx.fill();
-  gx.strokeStyle='#664422';gx.lineWidth=1.6;gx.lineCap='round';gx.beginPath();gx.arc(0,-24,3.5,.15,Math.PI-.15);gx.stroke();
+  drawLionCharacter(gx, x, y, facing, anim, mov, false);
+  gx.save();gx.translate(x,y+Math.sin(anim)*3.5);gx.scale(facing,1);
   if(basket.length>0){
+    // Basket on back/side
     gx.fillStyle='#9B5A1A';rr(-12,3,24,16,4);gx.fill();
+    gx.strokeStyle='#7a3a0a';gx.lineWidth=1.2;rr(-12,3,24,16,4);gx.stroke();
     const t=FRUITS.find(t=>t.key===basket[basket.length-1]);
     gx.font='11px serif';gx.textAlign='center';gx.textBaseline='middle';gx.fillText(t?t.em:'🍊',0,11);
     gx.textAlign='left';gx.textBaseline='alphabetic';
@@ -1112,10 +1269,13 @@ function drawPlayer(){
   }
   if(heldJuice){
     const f=FRUITS.find(t=>t.key===heldJuice);
-    gx.strokeStyle='rgba(140,200,255,.9)';gx.lineWidth=2.2;
-    gx.fillStyle='rgba(140,200,255,.22)';rr(-9,-55,28,34,6);gx.fill();gx.stroke();
-    gx.fillStyle=(f?f.fruit:'#FF8800')+'CC';rr(-7,-42,24,20,4);gx.fill();
-    gx.font='13px serif';gx.textAlign='center';gx.textBaseline='middle';gx.fillText(f?f.em:'🧃',5,-48);gx.textAlign='left';gx.textBaseline='alphabetic';
+    // Juice cup being held up
+    gx.strokeStyle='rgba(255,220,80,.9)';gx.lineWidth=2.5;
+    gx.fillStyle='rgba(255,200,50,.22)';rr(-11,-68,30,36,8);gx.fill();gx.stroke();
+    gx.fillStyle=(f?f.fruit:'#FF8800')+'DD';rr(-9,-55,26,22,5);gx.fill();
+    // Straw
+    gx.strokeStyle='#fff';gx.lineWidth=2;gx.beginPath();gx.moveTo(8,-56);gx.lineTo(10,-70);gx.stroke();
+    gx.font='14px serif';gx.textAlign='center';gx.textBaseline='middle';gx.fillText(f?f.em:'🧃',4,-62);gx.textAlign='left';gx.textBaseline='alphabetic';
   }
   gx.restore();
 }
@@ -1192,22 +1352,29 @@ function drawForestPortal(){
 }
 
 function drawForestScene(){
+  // Rich forest sky
   const sky=gx.createLinearGradient(0,0,0,H);
-  sky.addColorStop(0,'#1a4a08');sky.addColorStop(.4,'#2a6a10');sky.addColorStop(.7,'#3a8a18');sky.addColorStop(1,'#4aaa22');
+  sky.addColorStop(0,'#1a6a28');sky.addColorStop(.35,'#2a8a30');sky.addColorStop(.6,'#3aaa3a');sky.addColorStop(1,'#4aaa22');
   gx.fillStyle=sky;gx.fillRect(0,0,W,H);
-  gx.save();gx.globalAlpha=.07+Math.sin(tick*.018)*.04;gx.fillStyle='#FFFFAA';
-  for(let i=0;i<8;i++){gx.beginPath();gx.moveTo(80+i*120,0);gx.lineTo(60+i*110,H);gx.lineTo(75+i*110,H);gx.closePath();gx.fill();}
+  // Sun rays through trees
+  gx.save();gx.globalAlpha=.08+Math.sin(tick*.018)*.04;gx.fillStyle='#FFFFC8';
+  for(let i=0;i<9;i++){gx.beginPath();gx.moveTo(110+i*100,0);gx.lineTo(85+i*88,H);gx.lineTo(102+i*88,H);gx.closePath();gx.fill();}
   gx.restore();
-  gx.fillStyle='#2a6a12';gx.fillRect(0,460,W,H-460);
-  gx.fillStyle='#348a18';gx.fillRect(0,430,W,30);
-  for(let gp=0;gp<W;gp+=24){
-    const gh=6+Math.sin(gp*.3+tick*.012)*3;
-    gx.fillStyle=gp%48===0?'#44CC22':'#3aaa1a';gx.fillRect(gp,430-gh,10,gh);
+  // Ground
+  const gg=gx.createLinearGradient(0,420,0,H);
+  gg.addColorStop(0,'#2a7a12');gg.addColorStop(.4,'#348a18');gg.addColorStop(1,'#1e5a10');
+  gx.fillStyle=gg;gx.fillRect(0,420,W,H-420);
+  // Denser grass
+  for(let gp=0;gp<W;gp+=16){
+    const gh=7+Math.sin(gp*.28+tick*.012)*3.5;
+    gx.fillStyle=gp%32===0?'#50DD28':'#42BB1a';gx.beginPath();gx.moveTo(gp,420);gx.lineTo(gp+4,420-gh-3);gx.lineTo(gp+8,420);gx.fill();
   }
-  [[80,445],[230,448],[440,442],[620,446],[800,444],[950,447]].forEach(([mx,my])=>{gx.textAlign='center';gx.font='14px serif';gx.fillText('🍄',mx,my);});
-  [[150,450],[380,448],[560,452],[740,449],[920,451]].forEach(([fx,fy])=>{gx.fillStyle='#FFE066';gx.font='12px serif';gx.fillText('✿',fx,fy);});
+  // Mushrooms and flowers with more variety
+  [[80,445,'🍄'],[230,448,'🍄'],[440,442,'🍄'],[620,446,'🍄'],[800,444,'🍄'],[950,447,'🍄']].forEach(([mx,my,e])=>{gx.textAlign='center';gx.font='14px serif';gx.fillText(e,mx,my);});
+  [[150,450,'✿'],[380,448,'✾'],[560,452,'✿'],[740,449,'✾'],[920,451,'✿']].forEach(([fx,fy,f])=>{gx.fillStyle='#FFE066';gx.font='13px serif';gx.fillText(f,fx,fy);});
   gx.textAlign='left';
   [...FOREST_TREES].sort((a,b)=>a.y-b.y).forEach(drawForestTree);
+  // Return portal
   const portalX=512,portalY=565;
   const g2=.6+Math.sin(tick*.04+1)*.4;
   gx.fillStyle=`rgba(255,200,50,${g2*.3})`;gx.beginPath();gx.ellipse(portalX,portalY,80,22,0,0,Math.PI*2);gx.fill();
@@ -1222,11 +1389,12 @@ function drawForestScene(){
     gx.fillStyle='#332200';gx.font='bold 11px Nunito';gx.textAlign='center';
     gx.fillText('[E] Cueillir '+t.em,t.x,t.y-25);gx.textAlign='left';
   });
-  gx.fillStyle='rgba(255,255,255,.94)';rr(10,10,190,40,12);gx.fill();
-  gx.fillStyle='#554400';gx.font='bold 13px Nunito';
+  // HUD
+  gx.fillStyle='rgba(20,10,4,.82)';gx.strokeStyle='rgba(255,200,80,.4)';gx.lineWidth=2;rr(10,10,200,44,12);gx.fill();gx.stroke();
+  gx.fillStyle='#FFD060';gx.font='bold 13px Nunito';
   gx.fillText('🧺 Panier : '+basket.length+' fruits',20,34);
   const cnts={};basket.forEach(k=>cnts[k]=(cnts[k]||0)+1);
-  let bx2=210;
+  let bx2=220;
   Object.entries(cnts).forEach(([k,n])=>{
     const f=FRUITS.find(t=>t.key===k);
     gx.fillStyle='rgba(255,255,255,.9)';rr(bx2,10,56,40,10);gx.fill();
@@ -1272,29 +1440,12 @@ function drawForestTree(t){
 
 function drawForestPlayer(){
   const{x,y,facing,anim}=fPlayer;
-  const bob=Math.sin(anim)*3.5;
-  const leg=Math.sin(anim*2)*16;
   const mov=Math.abs(fPlayer.vx)>.1||Math.abs(fPlayer.vy)>.1;
-  gx.fillStyle='rgba(0,0,0,.15)';gx.beginPath();gx.ellipse(x,y+14,13,4.5,0,0,Math.PI*2);gx.fill();
-  gx.save();gx.translate(x,y+bob);gx.scale(facing,1);
-  [[-6,leg],[6,-leg]].forEach(([lx,r])=>{
-    gx.save();gx.translate(lx,12);gx.rotate(r*Math.PI/180);
-    gx.fillStyle='#3355CC';gx.fillRect(-4,0,8,16);
-    gx.fillStyle='#111';rr(-4.5,13,9,6,2);gx.fill();gx.restore();
-  });
-  gx.fillStyle=`hsl(${player.hue},65%,38%)`;rr(-11,-20,22,26,6);gx.fill();
-  gx.fillStyle=`hsl(${player.hue},65%,56%)`;rr(-8,-16,8,8,3);gx.fill();
-  gx.save();gx.translate(-15,-8);gx.rotate(mov?-leg*.026:-.28);gx.fillStyle='#FFCC88';gx.fillRect(-3.5,0,7,14);gx.restore();
-  gx.save();gx.translate(15,-8);gx.rotate(mov?leg*.026:.28);gx.fillStyle='#FFCC88';gx.fillRect(-3.5,0,7,14);gx.restore();
-  gx.fillStyle='#FFCC88';gx.beginPath();gx.arc(0,-28,13,0,Math.PI*2);gx.fill();
-  gx.fillStyle='#3a1a0a';gx.beginPath();gx.ellipse(0,-37,12,6,0,Math.PI,Math.PI*2);gx.fill();
-  gx.fillStyle='#222';gx.beginPath();gx.arc(-4,-29,2,0,Math.PI*2);gx.fill();gx.beginPath();gx.arc(4,-29,2,0,Math.PI*2);gx.fill();
-  gx.fillStyle='#fff';gx.beginPath();gx.arc(-3.2,-30,.9,0,Math.PI*2);gx.fill();gx.beginPath();gx.arc(4.8,-30,.9,0,Math.PI*2);gx.fill();
-  gx.strokeStyle='#664422';gx.lineWidth=1.6;gx.lineCap='round';gx.beginPath();gx.arc(0,-24,3.5,.15,Math.PI-.15);gx.stroke();
-  gx.fillStyle='#5a8a20';rr(-13,-44,26,10,4);gx.fill();
-  gx.fillStyle='#4a7a10';rr(-9,-52,18,12,3);gx.fill();
+  drawLionCharacter(gx, x, y, facing, anim, mov, true);
+  gx.save();gx.translate(x,y+Math.sin(anim)*3.5);gx.scale(facing,1);
   if(basket.length>0){
     gx.fillStyle='#9B5A1A';rr(-12,3,24,16,4);gx.fill();
+    gx.strokeStyle='#7a3a0a';gx.lineWidth=1.2;rr(-12,3,24,16,4);gx.stroke();
     const t=FRUITS.find(t=>t.key===basket[basket.length-1]);
     gx.font='11px serif';gx.textAlign='center';gx.textBaseline='middle';gx.fillText(t?t.em:'🍊',0,11);
     gx.textAlign='left';gx.textBaseline='alphabetic';
@@ -1531,6 +1682,18 @@ function scaleGame(){
   const offsetX=(window.innerWidth-1024*scale)/2;
   const offsetY=(window.innerHeight-620*scale)/2;
   shell.style.transform=`translate(${offsetX}px,${offsetY}px) scale(${scale})`;
+  
+  // Scale splash screen
+  const splash=document.getElementById('splash-screen');
+  if(splash&&!splash.classList.contains('hidden')){
+    const invScale=1/scale;
+    splash.style.transformOrigin='top left';
+    splash.style.width=(window.innerWidth*invScale)+'px';
+    splash.style.height=(window.innerHeight*invScale)+'px';
+    splash.style.left=(-offsetX*invScale)+'px';
+    splash.style.top=(-offsetY*invScale)+'px';
+  }
+
   const ws=document.getElementById('welcome-screen');
   if(ws&&!ws.classList.contains('hidden')){
     const invScale=1/scale;
