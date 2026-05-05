@@ -113,7 +113,6 @@ transition:transform .2s cubic-bezier(.34,1.56,.64,1),opacity .15s;
 #tc-yes{background:linear-gradient(135deg,#DD3333,#AA1111);color:#fff;}
 #tc-no{background:rgba(255,255,255,.12);color:#ddd;border:1px solid rgba(255,255,255,.2);}
 
-/* ── FRUIT PICKER ── */
 #fruit-picker{
   position:absolute;
   left:50%;bottom:90px;
@@ -160,7 +159,6 @@ transition:transform .2s cubic-bezier(.34,1.56,.64,1),opacity .15s;
 }
 .fp-cancel:hover{background:rgba(255,255,255,.1);color:#fff;}
 
-/* ── MESSAGE SYSTEM ── */
 #msg-box{
   position:absolute;
   bottom:58px;left:50%;
@@ -343,8 +341,7 @@ const gx = cv.getContext('2d');
 const W = 1024, H = 620;
 const ROAD_Y = 370, ROAD_H = 46;
 
-// ── FIX: patience in frames at 60fps. 3600 = 60s, 3000 = 50s ──
-const PATIENCE_FRAMES = 3000; // 50 seconds
+const PATIENCE_FRAMES = 3000; // 50 secondes
 
 const FRUITS = [
   { key:'orange', em:'🍊', fruit:'#FF8800', pay:12, label:'Orange' },
@@ -354,6 +351,37 @@ const FRUITS = [
   { key:'mango',  em:'🥭', fruit:'#FF6600', pay:14, label:'Mangue' },
   { key:'pine',   em:'🍍', fruit:'#CCAA00', pay:18, label:'Ananas' },
 ];
+
+// ── SLOTS : 5 emplacements fixes, espacés de 72px, centrés sous le bar ──
+const MAX_SLOTS = 5;
+const SLOT_SPACING = 72;
+const SLOT_BASE_X = bar_x_placeholder(); // calculé plus bas
+const SLOT_Y = 492;
+
+function getSlotX(slotIdx) {
+  // Centré autour de bar.x + 120
+  const totalW = (MAX_SLOTS - 1) * SLOT_SPACING;
+  return 680 + 120 - totalW / 2 + slotIdx * SLOT_SPACING;
+}
+
+// Ensemble des slots occupés
+let occupiedSlots = new Set();
+
+function claimSlot() {
+  for (let i = 0; i < MAX_SLOTS; i++) {
+    if (!occupiedSlots.has(i)) {
+      occupiedSlots.add(i);
+      return i;
+    }
+  }
+  return -1; // plus de place
+}
+
+function releaseSlot(slotIdx) {
+  occupiedSlots.delete(slotIdx);
+}
+
+function bar_x_placeholder(){ return 680; } // dummy, bar défini plus bas
 
 let gameStarted = false;
 
@@ -372,7 +400,7 @@ let msgTypingIdx = 0;
 let msgTypingTick = 0;
 let msgCurrent = null;
 let msgAutoHideTimer = null;
-let msgShownKeys = new Set(); // prevent repeat messages
+let msgShownKeys = new Set();
 
 function queueMsg(charKey, text, opts={}){
   const key = opts.key || (charKey+':'+text.slice(0,20));
@@ -408,7 +436,6 @@ function updateMsgSystem(){
   if(!msgActive || !msgCurrent) return;
   const txt = msgCurrent.text;
   msgTypingTick++;
-  // Type one char every 1.5 ticks
   if(msgTypingIdx < txt.length && msgTypingTick % 2 === 0){
     msgTypingIdx++;
     document.getElementById('msg-text').textContent = txt.slice(0, msgTypingIdx);
@@ -423,13 +450,12 @@ function updateMsgSystem(){
   }
 }
 
-// ── GAME STATE TRACKING for contextual messages ──
 let prevBasketLen = 0;
 let prevHeldJuice = null;
 let prevScene = 'main';
 let prevCustomerCount = 0;
 let prevBlending = false;
-let msgCooldowns = {}; // key -> tick when last shown
+let msgCooldowns = {};
 
 function cooldown(key, frames){
   if((msgCooldowns[key]||0) > tick) return true;
@@ -443,7 +469,6 @@ function updateContextualMessages(){
   const waitingCustomers = customers.filter(c=>c.status==='wait');
   const urgentCustomers  = customers.filter(c=>c.status==='wait' && c.timer/c.patience > 0.65);
 
-  // ── New customer arrives ──
   if(customers.length > prevCustomerCount && customers.some(c=>c.status==='walk')){
     const c = customers[customers.length-1];
     const f = FRUITS.find(t=>t.key===c.want);
@@ -453,7 +478,6 @@ function updateContextualMessages(){
   }
   prevCustomerCount = customers.length;
 
-  // ── No fruits, no juice, customers waiting ──
   if(scene==='main' && !basket.length && !heldJuice && !blending && waitingCustomers.length>0){
     if(!cooldown('no_fruit_remind', 600)){
       const f = FRUITS.find(t=>t.key===waitingCustomers[0].want);
@@ -461,7 +485,6 @@ function updateContextualMessages(){
     }
   }
 
-  // ── Has fruits, not near bar ──
   if(scene==='main' && basket.length>0 && !heldJuice && !blending){
     const nearBar = dist(player,{x:bar.x+120,y:bar.y+220})<120;
     if(!nearBar && !cooldown('bring_to_bar', 500)){
@@ -469,7 +492,6 @@ function updateContextualMessages(){
     }
   }
 
-  // ── Basket filled (came back from forest) ──
   if(basket.length > prevBasketLen && basket.length >= 3 && scene==='main'){
     if(!cooldown('basket_full', 400)){
       queueMsg('barista', `Parfait ! Tu as ${basket.length} fruits 🧺 — va au blender ⚡ et choisit un fruit à mixer !`, {key:'basket_ok_'+basket.length});
@@ -477,14 +499,12 @@ function updateContextualMessages(){
   }
   prevBasketLen = basket.length;
 
-  // ── Blending just started ──
   if(blending && !prevBlending){
     const f = FRUITS.find(t=>t.key===blendFruit);
     queueMsg('barista', `Voilà, on mixe le ${f?f.label:''} ${f?f.em:'🍊'} ! Ça va être délicieux ! ⚡`, {key:'blend_start_'+blendFruit});
   }
   prevBlending = blending;
 
-  // ── Juice ready but no matching customer ──
   if(heldJuice && !prevHeldJuice){
     const match = customers.find(c=>c.status==='wait'&&c.want===heldJuice);
     const f = FRUITS.find(t=>t.key===heldJuice);
@@ -496,16 +516,11 @@ function updateContextualMessages(){
   }
   prevHeldJuice = heldJuice;
 
-  // ── Customer patience getting low (urgent) ──
   if(urgentCustomers.length>0 && heldJuice && !cooldown('urgent_serve', 360)){
     const f = FRUITS.find(t=>t.key===urgentCustomers[0].want);
     queueMsg('customer', `Excusez-moi… je commence à perdre patience ! Mon jus de ${f?f.label:'fruit'} ${f?f.em:'🍹'}, s'il vous plaît ! 😤`, {key:'urgent_'+tick});
   }
 
-  // ── Customer leaves without being served ──
-  // (handled in updateMain on status change to 'leave')
-
-  // ── Scene changes ──
   if(scene !== prevScene){
     if(scene==='journey' && prevScene==='main'){
       queueMsg('truck', `En route pour la forêt ! Maintiens ↑ ou W pour accélérer ! 🌲`, {key:'journey_start', once:true});
@@ -528,16 +543,12 @@ function updateContextualMessages(){
     prevScene = scene;
   }
 
-  // ── First customer ever ──
   if(customers.length===1 && customers[0].status==='walk' && !msgShownKeys.has('first_customer')){
     msgShownKeys.add('first_customer');
     setTimeout(()=>{
       queueMsg('barista', `Notre premier client arrive ! 🎉 Va vite à la forêt chercher des fruits si t'en as pas encore !`, {key:'fc'});
     }, 1200);
   }
-
-  // ── Level up congrats ──
-  // (handled in serve logic — we'll wire it below)
 }
 
 document.getElementById('btn-play').addEventListener('click', ()=>{
@@ -603,13 +614,11 @@ function closeAllPanels(){
 }
 
 function openFruitPicker(){
-  // Build counts of fruits in basket
   const counts={};
   basket.forEach(k=>counts[k]=(counts[k]||0)+1);
   const available=FRUITS.filter(f=>counts[f.key]>0);
   if(!available.length)return;
 
-  // If only one kind, skip picker and blend immediately
   if(available.length===1){
     startBlend(available[0].key);
     return;
@@ -737,24 +746,27 @@ function switchScene(to,cb){
   },350);
 }
 
-// ── FIX: customers queue at a fixed Y near the bar, player can easily reach them ──
-// Customers stand in a row at y=490 (below the bar counter, on the ground level)
-function queuePos(slotIdx){
-  return{x:bar.x+80+slotIdx*60, y:490};
-}
+// ── SLOT SYSTEM : chaque client reçoit un slot fixe à la création ──
+// getSlotX(slotIdx) : position X du slot dans la scène principale
+// Les slots sont espacés de SLOT_SPACING pixels, centrés sous le bar
 
 function mkCust(){
+  const slot = claimSlot();
+  if(slot === -1) return null; // plus de place
+
   return{
-    x:W+60,
-    y:490,
-    want:FRUITS[Math.floor(Math.random()*FRUITS.length)].key,
-    spd:1.8,
-    status:'walk',
-    patience: PATIENCE_FRAMES,  // FIX: 50 seconds
-    timer:0,
-    bob:Math.random()*Math.PI*2,
-    hue:Math.floor(Math.random()*360),
-    happyT:0
+    x: W + 60,          // démarre hors écran à droite
+    y: SLOT_Y,
+    targetX: getSlotX(slot), // destination fixe
+    slot: slot,
+    want: FRUITS[Math.floor(Math.random()*FRUITS.length)].key,
+    spd: 1.8,
+    status: 'walk',
+    patience: PATIENCE_FRAMES,
+    timer: 0,
+    bob: Math.random()*Math.PI*2,
+    hue: Math.floor(Math.random()*360),
+    happyT: 0
   };
 }
 
@@ -1120,7 +1132,8 @@ function drawPlayer(){
   gx.restore();
 }
 
-function drawCustomer(c, slotIdx){
+// ── drawCustomer utilise c.x / c.y (position courante), qui converge vers c.targetX / c.y ──
+function drawCustomer(c){
   const bob=Math.sin(c.bob)*(c.status==='walk'?4.5:2);
   const leg=c.status==='walk'?Math.sin(c.bob*2)*14:0;
   const sx=c.x,sy=c.y+bob;
@@ -1154,7 +1167,6 @@ function drawCustomer(c, slotIdx){
     gx.textAlign='center';gx.textBaseline='middle';gx.font='16px serif';
     gx.fillText((ft?ft.em:'🍊')+' 🧃',sx,sy-91);gx.textAlign='left';gx.textBaseline='alphabetic';
 
-    // ── FIX: show serve hint for ANY customer with matching juice nearby ──
     const playerNear = !player.inTruck && dist(player,{x:c.x,y:c.y})<120;
     if(playerNear && heldJuice){
       if(heldJuice===c.want){
@@ -1326,7 +1338,6 @@ function updateTip(){
   else setTip('Marche vers le 🚛 camion et appuie sur [E] pour monter !');
 }
 
-// ── FIX: key check helper ──
 function keyPressed(k){
   return keys[k] || keys[k.toLowerCase()] || keys[k.toUpperCase()];
 }
@@ -1362,22 +1373,18 @@ function updateMain(){
     if(keyPressed('e')){
       consumeKey('e');
 
-      // Close picker if open
       if(pickerOpen){ closeAllPanels(); return; }
 
-      // Enter truck
       if(dist(player,{x:truck.x+65,y:truck.y+30})<85){
         player.inTruck=true;
         return;
       }
 
-      // Enter forest portal
       if(dist(player,{x:290,y:ROAD_Y+24})<70){
         switchScene('forest',()=>{fPlayer.x=512;fPlayer.y=460;});
         return;
       }
 
-      // ── FIX: Serve customer — use larger radius (120) and check all waiting customers ──
       if(heldJuice){
         let served=false;
         for(let i=0;i<customers.length;i++){
@@ -1395,7 +1402,6 @@ function updateMain(){
               notify('🍹 Servi ! +$'+pay);
               break;
             } else {
-              // Wrong juice - show feedback
               floatAt(c.x,c.y-40,'❌ Mauvais jus !','#FF4444');
               notify('❌ Ce client ne veut pas ce jus !');
               break;
@@ -1403,7 +1409,6 @@ function updateMain(){
           }
         }
         if(!served){
-          // Try blender anyway if near bar
           if(dist(player,{x:bar.x+120,y:bar.y+220})<95&&basket.length&&!blending){
             openFruitPicker();
           }
@@ -1411,7 +1416,6 @@ function updateMain(){
         return;
       }
 
-      // Use blender
       if(dist(player,{x:bar.x+120,y:bar.y+220})<95){
         if(basket.length&&!blending&&!heldJuice){
           openFruitPicker();
@@ -1438,21 +1442,50 @@ function updateMain(){
     if(keyPressed('e')){consumeKey('e');player.inTruck=false;truck.speed=0;}
   }
 
+  // ── SPAWN : on ne crée un client que si un slot est disponible ──
   custCD--;
-  if(custCD<=0&&customers.length<5){customers.push(mkCust());custCD=200+Math.floor(Math.random()*120);}
-  customers.forEach((c,i)=>{
-    const qp=queuePos(i);
+  if(custCD<=0 && occupiedSlots.size < MAX_SLOTS){
+    const nc = mkCust();
+    if(nc) customers.push(nc);
+    custCD = 220 + Math.floor(Math.random()*140);
+  }
+
+  customers.forEach(c=>{
+    c.bob += .12;
     if(c.status==='walk'){
-      const dx2=qp.x-c.x,dy2=qp.y-c.y,d=Math.hypot(dx2,dy2);
-      if(d>2){c.x+=dx2/d*c.spd*1.2;c.y+=dy2/d*c.spd;}
-      else{c.x=qp.x;c.y=qp.y;c.status='wait';}
+      // Marche vers son slot fixe
+      const dx2 = c.targetX - c.x;
+      const dy2 = c.y - c.y; // même y
+      const d = Math.abs(dx2);
+      if(d > 2){
+        c.x += (dx2 > 0 ? 1 : -1) * c.spd * 1.4;
+      } else {
+        c.x = c.targetX;
+        c.status = 'wait';
+      }
     }
-    if(c.status==='wait'){c.timer+=1;if(c.timer>c.patience)c.status='leave';}
-    if(c.status==='happy'){c.happyT--;if(c.happyT<=0)c.status='leave';}
-    if(c.status==='leave')c.x+=c.spd*2.5;
-    c.bob+=.12;
+    if(c.status==='wait'){
+      c.timer += 1;
+      if(c.timer > c.patience) c.status = 'leave';
+    }
+    if(c.status==='happy'){
+      c.happyT--;
+      if(c.happyT <= 0) c.status = 'leave';
+    }
+    if(c.status==='leave'){
+      // Sort par la droite
+      c.x += c.spd * 2.5;
+    }
   });
-  customers=customers.filter(c=>c.x<W+140);
+
+  // Filtrer les clients partis et libérer leurs slots
+  customers = customers.filter(c => {
+    if(c.x > W + 140){
+      releaseSlot(c.slot);
+      return false;
+    }
+    return true;
+  });
 }
 
 function updateJourney(){
@@ -1510,13 +1543,17 @@ function update(){
   particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.12;p.life-=.022;});
   particles=particles.filter(p=>p.life>0);
   updateTip();
+  updateContextualMessages();
+  updateMsgSystem();
 }
 
 function draw(){
   gx.clearRect(0,0,W,H);
   if(scene==='main'){
     drawSky();drawGround();drawForestSide();drawForestPortal();drawJuiceBar();
-    customers.forEach((c,i)=>drawCustomer(c,i));drawTruck();drawPlayer();drawParticles();
+    // Dessiner les clients (pas besoin d'index, chacun a sa position fixe)
+    customers.forEach(c=>drawCustomer(c));
+    drawTruck();drawPlayer();drawParticles();
   } else if(scene==='journey'){drawJourneyScene();drawParticles();}
   else if(scene==='forest'){drawForestScene();drawParticles();}
 }
