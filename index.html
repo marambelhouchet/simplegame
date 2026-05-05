@@ -10,7 +10,6 @@ html,body{width:100vw;height:100vh;overflow:hidden;background:linear-gradient(16
 #shell{position:absolute;transform-origin:top left;width:1024px;height:620px;}
 canvas{display:block;width:1024px;height:620px;}
 
-/* ── SPLASH SCREEN ── */
 #splash-screen{
   position:absolute;inset:0;z-index:200;
   background:#000;
@@ -39,7 +38,6 @@ canvas{display:block;width:1024px;height:620px;}
 #btn-splash-play:active{transform:scale(.96);}
 #btn-splash-play img{width:100%;height:auto;display:block;}
 
-/* ── RULES SCREEN (second_page bg, blurred when modal open) ── */
 #welcome-screen{
   position:absolute;inset:0;z-index:100;
   background-image:url('assets/first_page.png');
@@ -49,7 +47,6 @@ canvas{display:block;width:1024px;height:620px;}
 }
 #welcome-screen.hidden{display:none;}
 
-/* Blur overlay behind modal */
 #ws-blur{
   position:absolute;inset:0;
   background:rgba(0,0,0,0);
@@ -62,7 +59,6 @@ canvas{display:block;width:1024px;height:620px;}
   background:rgba(0,0,0,0.35);
 }
 
-/* HOW TO PLAY modal card */
 #ws-modal{
   position:relative;z-index:2;
   display:flex;flex-direction:column;align-items:center;
@@ -79,7 +75,6 @@ canvas{display:block;width:1024px;height:620px;}
   filter:drop-shadow(0 16px 48px rgba(0,0,0,0.7));
   display:block;}
 
-/* SKIP button */
 #btn-skip{
   margin-top:-85px;
   background:none;border:none;cursor:pointer;padding:0;
@@ -141,7 +136,6 @@ transition:transform .2s cubic-bezier(.34,1.56,.64,1),opacity .15s;
 #tc-yes{background:linear-gradient(135deg,#DD3333,#AA1111);color:#fff;}
 #tc-no{background:rgba(255,255,255,.12);color:#ddd;border:1px solid rgba(255,255,255,.2);}
 
-/* ── FRUIT PICKER ── */
 #fruit-picker{
   position:absolute;
   left:50%;bottom:90px;
@@ -188,7 +182,6 @@ transition:transform .2s cubic-bezier(.34,1.56,.64,1),opacity .15s;
 }
 .fp-cancel:hover{background:rgba(255,255,255,.1);color:#fff;}
 
-/* ── MESSAGE SYSTEM ── */
 #msg-box{
   position:absolute;
   bottom:58px;left:50%;
@@ -287,6 +280,7 @@ transition:transform .2s cubic-bezier(.34,1.56,.64,1),opacity .15s;
     </button>
   </div>
 </div>
+
 <div id="hud">
   <div class="pill pg">💰 <span id="hM">$0</span></div>
   <div class="pill pp">⭐ Niv <span id="hL">1</span> &nbsp;|&nbsp; 🧺 <span id="hB">0</span></div>
@@ -347,9 +341,7 @@ const cv = document.getElementById('c');
 const gx = cv.getContext('2d');
 const W = 1024, H = 620;
 const ROAD_Y = 370, ROAD_H = 46;
-
-// ── FIX: patience in frames at 60fps. 3600 = 60s, 3000 = 50s ──
-const PATIENCE_FRAMES = 3000; // 50 seconds
+const PATIENCE_FRAMES = 3000;
 
 const FRUITS = [
   { key:'orange', em:'🍊', fruit:'#FF8800', pay:12, label:'Orange' },
@@ -359,6 +351,32 @@ const FRUITS = [
   { key:'mango',  em:'🥭', fruit:'#FF6600', pay:14, label:'Mangue' },
   { key:'pine',   em:'🍍', fruit:'#CCAA00', pay:18, label:'Ananas' },
 ];
+
+// ── SLOT SYSTEM (fix collègue) ──
+const MAX_SLOTS = 5;
+const SLOT_SPACING = 72;
+const SLOT_Y = 492;
+
+function getSlotX(slotIdx) {
+  const totalW = (MAX_SLOTS - 1) * SLOT_SPACING;
+  return 680 + 120 - totalW / 2 + slotIdx * SLOT_SPACING;
+}
+
+let occupiedSlots = new Set();
+
+function claimSlot() {
+  for (let i = 0; i < MAX_SLOTS; i++) {
+    if (!occupiedSlots.has(i)) {
+      occupiedSlots.add(i);
+      return i;
+    }
+  }
+  return -1;
+}
+
+function releaseSlot(slotIdx) {
+  occupiedSlots.delete(slotIdx);
+}
 
 let gameStarted = false;
 
@@ -377,7 +395,7 @@ let msgTypingIdx = 0;
 let msgTypingTick = 0;
 let msgCurrent = null;
 let msgAutoHideTimer = null;
-let msgShownKeys = new Set(); // prevent repeat messages
+let msgShownKeys = new Set();
 
 function queueMsg(charKey, text, opts={}){
   const key = opts.key || (charKey+':'+text.slice(0,20));
@@ -413,7 +431,6 @@ function updateMsgSystem(){
   if(!msgActive || !msgCurrent) return;
   const txt = msgCurrent.text;
   msgTypingTick++;
-  // Type one char every 1.5 ticks
   if(msgTypingIdx < txt.length && msgTypingTick % 2 === 0){
     msgTypingIdx++;
     document.getElementById('msg-text').textContent = txt.slice(0, msgTypingIdx);
@@ -428,13 +445,12 @@ function updateMsgSystem(){
   }
 }
 
-// ── GAME STATE TRACKING for contextual messages ──
 let prevBasketLen = 0;
 let prevHeldJuice = null;
 let prevScene = 'main';
 let prevCustomerCount = 0;
 let prevBlending = false;
-let msgCooldowns = {}; // key -> tick when last shown
+let msgCooldowns = {};
 
 function cooldown(key, frames){
   if((msgCooldowns[key]||0) > tick) return true;
@@ -448,7 +464,6 @@ function updateContextualMessages(){
   const waitingCustomers = customers.filter(c=>c.status==='wait');
   const urgentCustomers  = customers.filter(c=>c.status==='wait' && c.timer/c.patience > 0.65);
 
-  // ── New customer arrives ──
   if(customers.length > prevCustomerCount && customers.some(c=>c.status==='walk')){
     const c = customers[customers.length-1];
     const f = FRUITS.find(t=>t.key===c.want);
@@ -458,7 +473,6 @@ function updateContextualMessages(){
   }
   prevCustomerCount = customers.length;
 
-  // ── No fruits, no juice, customers waiting ──
   if(scene==='main' && !basket.length && !heldJuice && !blending && waitingCustomers.length>0){
     if(!cooldown('no_fruit_remind', 600)){
       const f = FRUITS.find(t=>t.key===waitingCustomers[0].want);
@@ -466,7 +480,6 @@ function updateContextualMessages(){
     }
   }
 
-  // ── Has fruits, not near bar ──
   if(scene==='main' && basket.length>0 && !heldJuice && !blending){
     const nearBar = dist(player,{x:bar.x+120,y:bar.y+220})<120;
     if(!nearBar && !cooldown('bring_to_bar', 500)){
@@ -474,7 +487,6 @@ function updateContextualMessages(){
     }
   }
 
-  // ── Basket filled (came back from forest) ──
   if(basket.length > prevBasketLen && basket.length >= 3 && scene==='main'){
     if(!cooldown('basket_full', 400)){
       queueMsg('barista', `Parfait ! Tu as ${basket.length} fruits 🧺 — va au blender ⚡ et choisit un fruit à mixer !`, {key:'basket_ok_'+basket.length});
@@ -482,14 +494,12 @@ function updateContextualMessages(){
   }
   prevBasketLen = basket.length;
 
-  // ── Blending just started ──
   if(blending && !prevBlending){
     const f = FRUITS.find(t=>t.key===blendFruit);
     queueMsg('barista', `Voilà, on mixe le ${f?f.label:''} ${f?f.em:'🍊'} ! Ça va être délicieux ! ⚡`, {key:'blend_start_'+blendFruit});
   }
   prevBlending = blending;
 
-  // ── Juice ready but no matching customer ──
   if(heldJuice && !prevHeldJuice){
     const match = customers.find(c=>c.status==='wait'&&c.want===heldJuice);
     const f = FRUITS.find(t=>t.key===heldJuice);
@@ -501,16 +511,11 @@ function updateContextualMessages(){
   }
   prevHeldJuice = heldJuice;
 
-  // ── Customer patience getting low (urgent) ──
   if(urgentCustomers.length>0 && heldJuice && !cooldown('urgent_serve', 360)){
     const f = FRUITS.find(t=>t.key===urgentCustomers[0].want);
     queueMsg('customer', `Excusez-moi… je commence à perdre patience ! Mon jus de ${f?f.label:'fruit'} ${f?f.em:'🍹'}, s'il vous plaît ! 😤`, {key:'urgent_'+tick});
   }
 
-  // ── Customer leaves without being served ──
-  // (handled in updateMain on status change to 'leave')
-
-  // ── Scene changes ──
   if(scene !== prevScene){
     if(scene==='journey' && prevScene==='main'){
       queueMsg('truck', `En route pour la forêt ! Maintiens ↑ ou W pour accélérer ! 🌲`, {key:'journey_start', once:true});
@@ -533,27 +538,19 @@ function updateContextualMessages(){
     prevScene = scene;
   }
 
-  // ── First customer ever ──
   if(customers.length===1 && customers[0].status==='walk' && !msgShownKeys.has('first_customer')){
     msgShownKeys.add('first_customer');
     setTimeout(()=>{
       queueMsg('barista', `Notre premier client arrive ! 🎉 Va vite à la forêt chercher des fruits si t'en as pas encore !`, {key:'fc'});
     }, 1200);
   }
-
-  // ── Level up congrats ──
-  // (handled in serve logic — we'll wire it below)
 }
 
-// Splash PLAY → blur first_page + show How To Play modal on top
 document.getElementById('btn-splash-play').addEventListener('click', ()=>{
-  // Show welcome-screen (same first_page bg) over splash
   const ws = document.getElementById('welcome-screen');
   ws.classList.remove('hidden');
-  // Hide splash so welcome-screen (same bg) shows through
   document.getElementById('splash-screen').classList.add('hidden');
   scaleGame();
-  // trigger blur + modal animation on next frame
   requestAnimationFrame(()=>{
     requestAnimationFrame(()=>{
       document.getElementById('ws-blur').classList.add('active');
@@ -562,7 +559,6 @@ document.getElementById('btn-splash-play').addEventListener('click', ()=>{
   });
 });
 
-// SKIP → start game
 document.getElementById('btn-skip').addEventListener('click', ()=>{
   document.getElementById('welcome-screen').classList.add('hidden');
   document.getElementById('shell').style.overflow='hidden';
@@ -626,18 +622,14 @@ function closeAllPanels(){
 }
 
 function openFruitPicker(){
-  // Build counts of fruits in basket
   const counts={};
   basket.forEach(k=>counts[k]=(counts[k]||0)+1);
   const available=FRUITS.filter(f=>counts[f.key]>0);
   if(!available.length)return;
-
-  // If only one kind, skip picker and blend immediately
   if(available.length===1){
     startBlend(available[0].key);
     return;
   }
-
   closeAllPanels();
   pickerOpen=true;
   const container=document.getElementById('fp-options');
@@ -760,24 +752,23 @@ function switchScene(to,cb){
   },350);
 }
 
-// ── FIX: customers queue at a fixed Y near the bar, player can easily reach them ──
-// Customers stand in a row at y=490 (below the bar counter, on the ground level)
-function queuePos(slotIdx){
-  return{x:bar.x+80+slotIdx*60, y:490};
-}
-
+// ── SLOT SYSTEM : mkCust utilise claimSlot() ──
 function mkCust(){
+  const slot = claimSlot();
+  if(slot === -1) return null;
   return{
-    x:W+60,
-    y:490,
-    want:FRUITS[Math.floor(Math.random()*FRUITS.length)].key,
-    spd:1.8,
-    status:'walk',
-    patience: PATIENCE_FRAMES,  // FIX: 50 seconds
-    timer:0,
-    bob:Math.random()*Math.PI*2,
-    hue:Math.floor(Math.random()*360),
-    happyT:0
+    x: W + 60,
+    y: SLOT_Y,
+    targetX: getSlotX(slot),
+    slot: slot,
+    want: FRUITS[Math.floor(Math.random()*FRUITS.length)].key,
+    spd: 1.8,
+    status: 'walk',
+    patience: PATIENCE_FRAMES,
+    timer: 0,
+    bob: Math.random()*Math.PI*2,
+    hue: Math.floor(Math.random()*360),
+    happyT: 0
   };
 }
 
@@ -896,38 +887,30 @@ function drawTruckAt(x,y){
 }
 
 function drawSky(){
-  // Rich blue sky gradient like the Stil Land image
   const sky=gx.createLinearGradient(0,0,0,H);
   sky.addColorStop(0,'#1a78C8');sky.addColorStop(0.3,'#4AA8E8');
   sky.addColorStop(0.55,'#82CCEE');sky.addColorStop(0.68,'#A8DFA0');sky.addColorStop(1,'#5DC840');
   gx.fillStyle=sky;gx.fillRect(0,0,W,H);
-  // Sun with glow
   gx.fillStyle='rgba(255,240,120,.22)';gx.beginPath();gx.arc(860,70,90,0,Math.PI*2);gx.fill();
   gx.fillStyle='rgba(255,235,100,.38)';gx.beginPath();gx.arc(860,70,65,0,Math.PI*2);gx.fill();
   gx.fillStyle='#FFE044';gx.beginPath();gx.arc(860,70,42,0,Math.PI*2);gx.fill();
   gx.fillStyle='#FFF088';gx.beginPath();gx.arc(852,62,18,0,Math.PI*2);gx.fill();
-  // Detailed clouds like the image - puffy and white
   function drawCloud(cx,cy,s,alpha){
     gx.fillStyle=`rgba(255,255,255,${alpha})`;
-    [[0,0,44],[- 34,12,30],[34,14,28],[- 58,22,22],[58,24,20],[20,20,32],[-20,22,26]].forEach(([ox,oy,r])=>{
+    [[0,0,44],[-34,12,30],[34,14,28],[-58,22,22],[58,24,20],[20,20,32],[-20,22,26]].forEach(([ox,oy,r])=>{
       gx.beginPath();gx.arc(cx+ox*s,cy+oy*s,r*s,0,Math.PI*2);gx.fill();
     });
   }
   drawCloud(160,52,1.1,.96);drawCloud(420,38,.92,.94);drawCloud(660,58,.98,.95);
   drawCloud(790,44,.78,.9);drawCloud(980,62,.85,.93);drawCloud(50,78,.65,.8);
-  // Distant barn like in the Stil Land image
   const bHorizon=ROAD_Y-90;
   gx.fillStyle='#8B2810';rr(680,bHorizon-30,60,38,2);gx.fill();
   gx.fillStyle='#AA3418';rr(681,bHorizon-31,58,10,2);gx.fill();
-  // Barn roof
   gx.fillStyle='#6B1808';gx.beginPath();gx.moveTo(677,bHorizon-30);gx.lineTo(710,bHorizon-60);gx.lineTo(743,bHorizon-30);gx.closePath();gx.fill();
   gx.fillStyle='#5a1406';gx.beginPath();gx.moveTo(677,bHorizon-30);gx.lineTo(710,bHorizon-60);gx.lineTo(712,bHorizon-60);gx.lineTo(679,bHorizon-30);gx.fill();
-  // Barn door
   gx.fillStyle='#5a1a08';rr(702,bHorizon-18,16,20,2);gx.fill();
-  // Windmill in distance
   gx.fillStyle='#CC9060';gx.fillRect(760,bHorizon-50,7,58);
   gx.fillStyle='#B07040';rr(758,bHorizon-55,11,12,3);gx.fill();
-  // Windmill blades
   const windAngle=tick*.015;
   gx.save();gx.translate(763,bHorizon-52);
   for(let wi=0;wi<4;wi++){
@@ -938,45 +921,34 @@ function drawSky(){
 }
 
 function drawGround(){
-  // Rich green grass gradient
   const grassGrad=gx.createLinearGradient(0,ROAD_Y-8,0,H);
   grassGrad.addColorStop(0,'#4CAE22');grassGrad.addColorStop(0.3,'#3A9A18');grassGrad.addColorStop(1,'#2A7A10');
   gx.fillStyle=grassGrad;gx.fillRect(0,ROAD_Y-8,W,H-ROAD_Y+8);
-  // Dirt path like in the image - warm brown with ruts
   const dirtGrad=gx.createLinearGradient(0,ROAD_Y,0,ROAD_Y+ROAD_H);
   dirtGrad.addColorStop(0,'#C8A070');dirtGrad.addColorStop(0.4,'#B88C5A');dirtGrad.addColorStop(1,'#A07840');
   gx.fillStyle=dirtGrad;gx.fillRect(0,ROAD_Y,W,ROAD_H);
-  // Path edge highlights
   gx.fillStyle='#D4AC82';gx.fillRect(0,ROAD_Y,W,4);
   gx.fillStyle='#8A6030';gx.fillRect(0,ROAD_Y+ROAD_H-3,W,3);
-  // Tire ruts / tracks
   gx.strokeStyle='rgba(100,70,30,.35)';gx.lineWidth=3;
   gx.beginPath();gx.moveTo(0,ROAD_Y+12);gx.lineTo(W,ROAD_Y+12);gx.stroke();
   gx.beginPath();gx.moveTo(0,ROAD_Y+ROAD_H-12);gx.lineTo(W,ROAD_Y+ROAD_H-12);gx.stroke();
-  // Small stones/pebbles on path
   [[80,ROAD_Y+18],[200,ROAD_Y+30],[350,ROAD_Y+22],[500,ROAD_Y+36],[680,ROAD_Y+20],[820,ROAD_Y+34],[950,ROAD_Y+25]].forEach(([px,py])=>{
     gx.fillStyle='rgba(140,110,70,.6)';gx.beginPath();gx.ellipse(px,py,4,2.5,Math.random()*.5,0,Math.PI*2);gx.fill();
   });
-  // Grass tufts on edges
   for(let gp=0;gp<W;gp+=14){
     const gh=5+Math.sin(gp*.35+tick*.014)*2.5;
-    // Above road
     gx.fillStyle=gp%28===0?'#5ACC30':'#48BB22';
     gx.beginPath();gx.moveTo(gp,ROAD_Y-1);gx.lineTo(gp+4,ROAD_Y-gh-2);gx.lineTo(gp+7,ROAD_Y-1);gx.fill();
-    // Below road
     gx.fillStyle=gp%28===0?'#5ACC30':'#48BB22';
     gx.beginPath();gx.moveTo(gp,ROAD_Y+ROAD_H+1);gx.lineTo(gp+4,ROAD_Y+ROAD_H+gh+2);gx.lineTo(gp+7,ROAD_Y+ROAD_H+1);gx.fill();
   }
-  // Colorful flowers on the ground (like Stil Land image)
   [[110,495,'#FF6688'],[260,545,'#FFAACC'],[590,515,'#FF88AA'],[800,495,'#FFD0E0'],[960,545,'#FF9988'],
    [75,558,'#FFCC44'],[450,562,'#FF8866'],[700,538,'#AADDFF'],[140,520,'#88FFCC']].forEach(([fx,fy,col])=>{
     gx.fillStyle=col;gx.font='13px serif';gx.textAlign='center';gx.fillText('❀',fx,fy);
   });
-  // Fence posts along road like in the image
   for(let fp=0;fp<W;fp+=70){
     gx.fillStyle='#9B6A30';gx.fillRect(fp,ROAD_Y-32,10,32);
     gx.fillStyle='#B8813A';gx.fillRect(fp,ROAD_Y-38,14,10);
-    // Horizontal fence rails
     if(fp>0){
       gx.fillStyle='#C8904A';gx.fillRect(fp-60,ROAD_Y-28,62,5);
       gx.fillStyle='#C8904A';gx.fillRect(fp-60,ROAD_Y-14,62,5);
@@ -986,17 +958,14 @@ function drawGround(){
 }
 
 function drawForestSide(){
-  // Dense forest gradient on left side
   const grad=gx.createLinearGradient(0,0,360,0);
   grad.addColorStop(0,'rgba(8,32,8,.75)');grad.addColorStop(0.6,'rgba(10,40,10,.4)');grad.addColorStop(1,'rgba(10,40,10,0)');
   gx.fillStyle=grad;gx.fillRect(0,0,360,ROAD_Y);
-  // Multiple layered trees for depth
   drawBigTreeAt(60,300,1.5,'#1e6a12','#145008','#9a4808');
   drawBigTreeAt(170,270,1.7,'#2a7a18','#1d5c10','#8a3808');
   drawBigTreeAt(300,285,1.3,'#258a1a','#186010','#b05010');
   drawBigTreeAt(130,330,0.9,'#1a5c10','#103808','#884408');
   drawBigTreeFruits(60,300,1.5);drawBigTreeFruits(170,270,1.7);drawBigTreeFruits(300,285,1.3);
-  // Stil Land sign like in the image
   gx.fillStyle='#6B3A10';rr(210,330,168,44,8);gx.fill();
   gx.fillStyle='#8B5A20';rr(210,330,168,12,5);gx.fill();
   gx.fillStyle='#C8883A';rr(210,330,168,8,5);gx.fill();
@@ -1004,7 +973,6 @@ function drawForestSide(){
   gx.fillText('🌿 Stil Land',294,355);
   gx.fillStyle='#7a3a10';gx.font='bold 11px Nunito';
   gx.fillText('Ferme & Marché',294,370);gx.textAlign='left';
-  // Sign post
   gx.fillStyle='#7a4a18';gx.fillRect(284,374,10,36);
   gx.fillStyle='#9B6030';gx.fillRect(282,376,4,32);
 }
@@ -1083,7 +1051,6 @@ function drawJuiceBar(){
   gx.textAlign='left';
   drawPot(bx+248,by+218,'#3a8a1a');
   drawBarista(bx+120,by+105);
-  // 100% NATUREL sign like in the Stil Land image
   gx.fillStyle='#2a6a18';rr(bx+168,by+195,72,40,8);gx.fill();
   gx.strokeStyle='#1a4a10';gx.lineWidth=2;rr(bx+168,by+195,72,40,8);gx.stroke();
   gx.fillStyle='#AAFFAA';gx.font='bold 9px Fredoka One,cursive';gx.textAlign='center';
@@ -1179,29 +1146,21 @@ function drawTruck(){
 function drawLionCharacter(gx2, x, y, facing, anim, mov, isForest){
   const bob=Math.sin(anim)*3.5;
   const leg=Math.sin(anim*2)*16;
-  const sc = isForest ? 1 : 1;
-  // Shadow
+  const sc = 1;
   gx2.fillStyle='rgba(0,0,0,.18)';gx2.beginPath();gx2.ellipse(x,y+15,15*sc,5,0,0,Math.PI*2);gx2.fill();
   gx2.save();gx2.translate(x,y+bob);gx2.scale(facing*sc,sc);
-  // Legs (brown pants)
   [[-7,leg],[7,-leg]].forEach(([lx,r])=>{
     gx2.save();gx2.translate(lx,14);gx2.rotate(r*Math.PI/180);
     gx2.fillStyle='#7A4A18';gx2.fillRect(-4.5,0,9,18);
-    // Boots
     gx2.fillStyle='#3a1a08';rr(-5,15,11,7,2);gx2.fill();gx2.restore();
   });
-  // Body - brown overalls
   gx2.fillStyle='#8B5A1A';rr(-13,-22,26,30,7);gx2.fill();
-  // Overalls detail/straps
   gx2.fillStyle='#7A4A12';rr(-10,-18,8,24,3);gx2.fill();
   gx2.fillStyle='#C68E2A';rr(-12,-22,24,8,4);gx2.fill();
-  // Belt
   gx2.fillStyle='#4a2a08';rr(-12,4,24,5,2);gx2.fill();
   gx2.fillStyle='#D4A844';rr(-4,4,8,5,1);gx2.fill();
-  // Stil badge on chest
   gx2.fillStyle='#FFD700';gx2.beginPath();gx2.arc(-2,-10,5,0,Math.PI*2);gx2.fill();
-  gx2.fillStyle='#2a6a18';gx2.font='bold 5px Arial';gx2.textAlign='center';gx2.textBaseline='middle';gx2.fillText('S',- 2,-10);gx2.textAlign='left';gx2.textBaseline='alphabetic';
-  // Arms
+  gx2.fillStyle='#2a6a18';gx2.font='bold 5px Arial';gx2.textAlign='center';gx2.textBaseline='middle';gx2.fillText('S',-2,-10);gx2.textAlign='left';gx2.textBaseline='alphabetic';
   gx2.save();gx2.translate(-16,-10);gx2.rotate(mov?-leg*.026:-.32);
   gx2.fillStyle='#C8841A';gx2.fillRect(-4,0,8,16);
   gx2.fillStyle='#D89030';gx2.beginPath();gx2.arc(0,16,4.5,0,Math.PI*2);gx2.fill();
@@ -1210,40 +1169,27 @@ function drawLionCharacter(gx2, x, y, facing, anim, mov, isForest){
   gx2.fillStyle='#C8841A';gx2.fillRect(-4,0,8,16);
   gx2.fillStyle='#D89030';gx2.beginPath();gx2.arc(0,16,4.5,0,Math.PI*2);gx2.fill();
   gx2.restore();
-  // Mane (big fluffy lion mane - main feature!)
   const maneC='#7a3808';
   gx2.fillStyle=maneC+'CC';gx2.beginPath();gx2.arc(0,-34,18,0,Math.PI*2);gx2.fill();
-  // Mane spiky outer ring
   for(let i=0;i<12;i++){
     const a=(i/12)*Math.PI*2;
     const mr=16+Math.sin(tick*.04+i)*1.5;
     gx2.fillStyle=i%2===0?'#8B4410':'#6a2c08';
     gx2.beginPath();gx2.arc(Math.cos(a)*mr,-34+Math.sin(a)*mr,5+Math.sin(tick*.03+i)*.5,0,Math.PI*2);gx2.fill();
   }
-  // Face - golden lion
   gx2.fillStyle='#D4913A';gx2.beginPath();gx2.arc(0,-36,13,0,Math.PI*2);gx2.fill();
-  // Face shading
   gx2.fillStyle='#E8A850';gx2.beginPath();gx2.arc(2,-36,10,0,Math.PI*2);gx2.fill();
-  // Snout/muzzle area
   gx2.fillStyle='#F0C878';gx2.beginPath();gx2.ellipse(0,-31,7,5,0,0,Math.PI*2);gx2.fill();
-  // Straw hat
   gx2.fillStyle='#D4B866';gx2.beginPath();gx2.ellipse(0,-48,16,5,0,0,Math.PI*2);gx2.fill();
   gx2.fillStyle='#C8A840';rr(-10,-53,20,8,3);gx2.fill();
-  // Hat band
   gx2.fillStyle='#2a6a18';rr(-10,-51,20,4,2);gx2.fill();
-  // Hat "Stil" text on band
-  gx2.fillStyle='#FFD700';gx2.font='bold 4px Arial';gx2.textAlign='center';gx2.textBaseline='middle';gx2.fillText('Stil',-0,-49);gx2.textAlign='left';gx2.textBaseline='alphabetic';
-  // Eyes
+  gx2.fillStyle='#FFD700';gx2.font='bold 4px Arial';gx2.textAlign='center';gx2.textBaseline='middle';gx2.fillText('Stil',0,-49);gx2.textAlign='left';gx2.textBaseline='alphabetic';
   gx2.fillStyle='#1a0a00';gx2.beginPath();gx2.arc(-4,-37,2.2,0,Math.PI*2);gx2.fill();gx2.beginPath();gx2.arc(4,-37,2.2,0,Math.PI*2);gx2.fill();
   gx2.fillStyle='#fff';gx2.beginPath();gx2.arc(-3.2,-37.8,.9,0,Math.PI*2);gx2.fill();gx2.beginPath();gx2.arc(4.8,-37.8,.9,0,Math.PI*2);gx2.fill();
-  // Nose
   gx2.fillStyle='#3a1808';gx2.beginPath();gx2.ellipse(0,-33,2.5,1.8,0,0,Math.PI*2);gx2.fill();
-  // Smile
   gx2.strokeStyle='#6a2808';gx2.lineWidth=1.5;gx2.lineCap='round';gx2.beginPath();gx2.arc(0,-29,3.5,.15,Math.PI-.15);gx2.stroke();
-  // Whiskers
   gx2.strokeStyle='rgba(255,220,150,.8)';gx2.lineWidth=0.8;
   [[-4,-32,-12,-30],[4,-32,12,-30],[-4,-33,-11,-34],[4,-33,11,-34]].forEach(([x1,y1,x2,y2])=>{gx2.beginPath();gx2.moveTo(x1,y1);gx2.lineTo(x2,y2);gx2.stroke();});
-  // Ears (lion ears above mane)
   [[-11,-46],[11,-46]].forEach(([ex,ey])=>{
     gx2.fillStyle='#8B4410';gx2.beginPath();gx2.arc(ex,ey,5,0,Math.PI*2);gx2.fill();
     gx2.fillStyle='#D4913A';gx2.beginPath();gx2.arc(ex,ey,3,0,Math.PI*2);gx2.fill();
@@ -1254,12 +1200,10 @@ function drawLionCharacter(gx2, x, y, facing, anim, mov, isForest){
 function drawPlayer(){
   if(player.inTruck)return;
   const{x,y,facing,anim}=player;
-  const bob=Math.sin(anim)*3.5;
   const mov=Math.abs(player.vx)>.1||Math.abs(player.vy)>.1;
   drawLionCharacter(gx, x, y, facing, anim, mov, false);
   gx.save();gx.translate(x,y+Math.sin(anim)*3.5);gx.scale(facing,1);
   if(basket.length>0){
-    // Basket on back/side
     gx.fillStyle='#9B5A1A';rr(-12,3,24,16,4);gx.fill();
     gx.strokeStyle='#7a3a0a';gx.lineWidth=1.2;rr(-12,3,24,16,4);gx.stroke();
     const t=FRUITS.find(t=>t.key===basket[basket.length-1]);
@@ -1269,18 +1213,16 @@ function drawPlayer(){
   }
   if(heldJuice){
     const f=FRUITS.find(t=>t.key===heldJuice);
-    // Juice cup being held up
     gx.strokeStyle='rgba(255,220,80,.9)';gx.lineWidth=2.5;
     gx.fillStyle='rgba(255,200,50,.22)';rr(-11,-68,30,36,8);gx.fill();gx.stroke();
     gx.fillStyle=(f?f.fruit:'#FF8800')+'DD';rr(-9,-55,26,22,5);gx.fill();
-    // Straw
     gx.strokeStyle='#fff';gx.lineWidth=2;gx.beginPath();gx.moveTo(8,-56);gx.lineTo(10,-70);gx.stroke();
     gx.font='14px serif';gx.textAlign='center';gx.textBaseline='middle';gx.fillText(f?f.em:'🧃',4,-62);gx.textAlign='left';gx.textBaseline='alphabetic';
   }
   gx.restore();
 }
 
-function drawCustomer(c, slotIdx){
+function drawCustomer(c){
   const bob=Math.sin(c.bob)*(c.status==='walk'?4.5:2);
   const leg=c.status==='walk'?Math.sin(c.bob*2)*14:0;
   const sx=c.x,sy=c.y+bob;
@@ -1313,8 +1255,6 @@ function drawCustomer(c, slotIdx){
     const ft=FRUITS.find(t=>t.key===c.want);
     gx.textAlign='center';gx.textBaseline='middle';gx.font='16px serif';
     gx.fillText((ft?ft.em:'🍊')+' 🧃',sx,sy-91);gx.textAlign='left';gx.textBaseline='alphabetic';
-
-    // ── FIX: show serve hint for ANY customer with matching juice nearby ──
     const playerNear = !player.inTruck && dist(player,{x:c.x,y:c.y})<120;
     if(playerNear && heldJuice){
       if(heldJuice===c.want){
@@ -1352,29 +1292,23 @@ function drawForestPortal(){
 }
 
 function drawForestScene(){
-  // Rich forest sky
   const sky=gx.createLinearGradient(0,0,0,H);
   sky.addColorStop(0,'#1a6a28');sky.addColorStop(.35,'#2a8a30');sky.addColorStop(.6,'#3aaa3a');sky.addColorStop(1,'#4aaa22');
   gx.fillStyle=sky;gx.fillRect(0,0,W,H);
-  // Sun rays through trees
   gx.save();gx.globalAlpha=.08+Math.sin(tick*.018)*.04;gx.fillStyle='#FFFFC8';
   for(let i=0;i<9;i++){gx.beginPath();gx.moveTo(110+i*100,0);gx.lineTo(85+i*88,H);gx.lineTo(102+i*88,H);gx.closePath();gx.fill();}
   gx.restore();
-  // Ground
   const gg=gx.createLinearGradient(0,420,0,H);
   gg.addColorStop(0,'#2a7a12');gg.addColorStop(.4,'#348a18');gg.addColorStop(1,'#1e5a10');
   gx.fillStyle=gg;gx.fillRect(0,420,W,H-420);
-  // Denser grass
   for(let gp=0;gp<W;gp+=16){
     const gh=7+Math.sin(gp*.28+tick*.012)*3.5;
     gx.fillStyle=gp%32===0?'#50DD28':'#42BB1a';gx.beginPath();gx.moveTo(gp,420);gx.lineTo(gp+4,420-gh-3);gx.lineTo(gp+8,420);gx.fill();
   }
-  // Mushrooms and flowers with more variety
   [[80,445,'🍄'],[230,448,'🍄'],[440,442,'🍄'],[620,446,'🍄'],[800,444,'🍄'],[950,447,'🍄']].forEach(([mx,my,e])=>{gx.textAlign='center';gx.font='14px serif';gx.fillText(e,mx,my);});
   [[150,450,'✿'],[380,448,'✾'],[560,452,'✿'],[740,449,'✾'],[920,451,'✿']].forEach(([fx,fy,f])=>{gx.fillStyle='#FFE066';gx.font='13px serif';gx.fillText(f,fx,fy);});
   gx.textAlign='left';
   [...FOREST_TREES].sort((a,b)=>a.y-b.y).forEach(drawForestTree);
-  // Return portal
   const portalX=512,portalY=565;
   const g2=.6+Math.sin(tick*.04+1)*.4;
   gx.fillStyle=`rgba(255,200,50,${g2*.3})`;gx.beginPath();gx.ellipse(portalX,portalY,80,22,0,0,Math.PI*2);gx.fill();
@@ -1389,7 +1323,6 @@ function drawForestScene(){
     gx.fillStyle='#332200';gx.font='bold 11px Nunito';gx.textAlign='center';
     gx.fillText('[E] Cueillir '+t.em,t.x,t.y-25);gx.textAlign='left';
   });
-  // HUD
   gx.fillStyle='rgba(20,10,4,.82)';gx.strokeStyle='rgba(255,200,80,.4)';gx.lineWidth=2;rr(10,10,200,44,12);gx.fill();gx.stroke();
   gx.fillStyle='#FFD060';gx.font='bold 13px Nunito';
   gx.fillText('🧺 Panier : '+basket.length+' fruits',20,34);
@@ -1477,7 +1410,6 @@ function updateTip(){
   else setTip('Marche vers le 🚛 camion et appuie sur [E] pour monter !');
 }
 
-// ── FIX: key check helper ──
 function keyPressed(k){
   return keys[k] || keys[k.toLowerCase()] || keys[k.toUpperCase()];
 }
@@ -1512,23 +1444,15 @@ function updateMain(){
 
     if(keyPressed('e')){
       consumeKey('e');
-
-      // Close picker if open
       if(pickerOpen){ closeAllPanels(); return; }
-
-      // Enter truck
       if(dist(player,{x:truck.x+65,y:truck.y+30})<85){
         player.inTruck=true;
         return;
       }
-
-      // Enter forest portal
       if(dist(player,{x:290,y:ROAD_Y+24})<70){
         switchScene('forest',()=>{fPlayer.x=512;fPlayer.y=460;});
         return;
       }
-
-      // ── FIX: Serve customer — use larger radius (120) and check all waiting customers ──
       if(heldJuice){
         let served=false;
         for(let i=0;i<customers.length;i++){
@@ -1546,7 +1470,6 @@ function updateMain(){
               notify('🍹 Servi ! +$'+pay);
               break;
             } else {
-              // Wrong juice - show feedback
               floatAt(c.x,c.y-40,'❌ Mauvais jus !','#FF4444');
               notify('❌ Ce client ne veut pas ce jus !');
               break;
@@ -1554,15 +1477,12 @@ function updateMain(){
           }
         }
         if(!served){
-          // Try blender anyway if near bar
           if(dist(player,{x:bar.x+120,y:bar.y+220})<95&&basket.length&&!blending){
             openFruitPicker();
           }
         }
         return;
       }
-
-      // Use blender
       if(dist(player,{x:bar.x+120,y:bar.y+220})<95){
         if(basket.length&&!blending&&!heldJuice){
           openFruitPicker();
@@ -1589,21 +1509,46 @@ function updateMain(){
     if(keyPressed('e')){consumeKey('e');player.inTruck=false;truck.speed=0;}
   }
 
+  // ── SPAWN avec slot system ──
   custCD--;
-  if(custCD<=0&&customers.length<5){customers.push(mkCust());custCD=200+Math.floor(Math.random()*120);}
-  customers.forEach((c,i)=>{
-    const qp=queuePos(i);
+  if(custCD<=0 && occupiedSlots.size < MAX_SLOTS){
+    const nc = mkCust();
+    if(nc) customers.push(nc);
+    custCD = 220 + Math.floor(Math.random()*140);
+  }
+
+  customers.forEach(c=>{
+    c.bob += .12;
     if(c.status==='walk'){
-      const dx2=qp.x-c.x,dy2=qp.y-c.y,d=Math.hypot(dx2,dy2);
-      if(d>2){c.x+=dx2/d*c.spd*1.2;c.y+=dy2/d*c.spd;}
-      else{c.x=qp.x;c.y=qp.y;c.status='wait';}
+      const dx2 = c.targetX - c.x;
+      if(Math.abs(dx2) > 2){
+        c.x += (dx2 > 0 ? 1 : -1) * c.spd * 1.4;
+      } else {
+        c.x = c.targetX;
+        c.status = 'wait';
+      }
     }
-    if(c.status==='wait'){c.timer+=1;if(c.timer>c.patience)c.status='leave';}
-    if(c.status==='happy'){c.happyT--;if(c.happyT<=0)c.status='leave';}
-    if(c.status==='leave')c.x+=c.spd*2.5;
-    c.bob+=.12;
+    if(c.status==='wait'){
+      c.timer += 1;
+      if(c.timer > c.patience) c.status = 'leave';
+    }
+    if(c.status==='happy'){
+      c.happyT--;
+      if(c.happyT <= 0) c.status = 'leave';
+    }
+    if(c.status==='leave'){
+      c.x += c.spd * 2.5;
+    }
   });
-  customers=customers.filter(c=>c.x<W+140);
+
+  // Filtrer et libérer les slots
+  customers = customers.filter(c => {
+    if(c.x > W + 140){
+      releaseSlot(c.slot);
+      return false;
+    }
+    return true;
+  });
 }
 
 function updateJourney(){
@@ -1661,13 +1606,16 @@ function update(){
   particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.12;p.life-=.022;});
   particles=particles.filter(p=>p.life>0);
   updateTip();
+  updateContextualMessages();
+  updateMsgSystem();
 }
 
 function draw(){
   gx.clearRect(0,0,W,H);
   if(scene==='main'){
     drawSky();drawGround();drawForestSide();drawForestPortal();drawJuiceBar();
-    customers.forEach((c,i)=>drawCustomer(c,i));drawTruck();drawPlayer();drawParticles();
+    customers.forEach(c=>drawCustomer(c));
+    drawTruck();drawPlayer();drawParticles();
   } else if(scene==='journey'){drawJourneyScene();drawParticles();}
   else if(scene==='forest'){drawForestScene();drawParticles();}
 }
@@ -1682,8 +1630,6 @@ function scaleGame(){
   const offsetX=(window.innerWidth-1024*scale)/2;
   const offsetY=(window.innerHeight-620*scale)/2;
   shell.style.transform=`translate(${offsetX}px,${offsetY}px) scale(${scale})`;
-  
-  // Scale splash screen
   const splash=document.getElementById('splash-screen');
   if(splash&&!splash.classList.contains('hidden')){
     const invScale=1/scale;
@@ -1693,7 +1639,6 @@ function scaleGame(){
     splash.style.left=(-offsetX*invScale)+'px';
     splash.style.top=(-offsetY*invScale)+'px';
   }
-
   const ws=document.getElementById('welcome-screen');
   if(ws&&!ws.classList.contains('hidden')){
     const invScale=1/scale;
